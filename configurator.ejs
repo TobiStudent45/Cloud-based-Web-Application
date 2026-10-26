@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria Dynamics | 3D Hyper-Konfigurator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Three.js & OrbitControls für interaktive 3D-Darstellung -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+      :root {
+        --bg-dark: #0a0c10;
+        --card-bg: rgba(22, 27, 34, 0.8);
+        --accent-blue: #00d2ff;
+        --accent-glow: rgba(0, 210, 255, 0.35);
+        --text-main: #f0f6fc;
+        --text-muted: #8b949e;
+        --border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+        transition: background 0.25s, border-color 0.25s, transform 0.25s;
+      }
+
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: 0;
+        padding: 30px;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        background-image: 
+          radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+          radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.08) 0%, transparent 40%);
+      }
+
+      .container {
+        max-width: 1440px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 0;
+        background: linear-gradient(135deg, #fff 30%, var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .header p {
+        color: var(--text-muted);
+        margin-top: 6px;
+        font-size: 0.95rem;
+      }
+
+      .configurator-grid {
+        display: grid;
+        grid-template-columns: 1fr 440px;
+        gap: 30px;
+      }
+
+      @media (max-width: 1024px) {
+        .configurator-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Linke Seite: 3D Stage & Stats */
+      .preview-box {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .preview-box::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+      }
+
+      /* 3D Canvas Container */
+      .car-stage-3d {
+        width: 100%;
+        height: 380px;
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 15px 0;
+        background: radial-gradient(circle at center, #1a2230 0%, #0a0c10 90%);
+        border: 1px solid rgba(255,255,255,0.05);
+        cursor: grab;
+      }
+
+      .car-stage-3d:active {
+        cursor: grabbing;
+      }
+
+      #canvas-container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .controls-hint {
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.6);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        pointer-events: none;
+        border: 1px solid var(--border-color);
+      }
+
+      .price-container {
+        text-align: center;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+      }
+
+      .price-label {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+
+      .total-price {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 4px 0;
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+
+      .leasing-hint {
+        font-size: 0.85rem;
+        color: var(--accent-blue);
+      }
+
+      .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .spec-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .spec-card span {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+      }
+
+      .spec-card strong {
+        font-size: 0.9rem;
+        color: #fff;
+      }
+
+      /* Rechte Seite: Konfiguration */
+      .selection-box {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title::before {
+        content: '';
+        width: 4px;
+        height: 18px;
+        background: var(--accent-blue);
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--accent-blue);
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+
+      select {
+        width: 100%;
+        padding: 12px;
+        background: rgba(10, 12, 16, 0.85);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        cursor: pointer;
+      }
+
+      select:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 12px var(--accent-glow);
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(10, 12, 16, 0.5);
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+
+      .checkbox-item:hover {
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.03);
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        accent-color: var(--accent-blue);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--accent-blue), #0072ff);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        margin-top: 15px;
+        box-shadow: 0 10px 20px var(--accent-glow);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px var(--accent-glow);
+      }
+    </style>
+  </head>
+  <body>
+
+
+      <div class="configurator-grid">
+        
+        <!-- LINKS: 3D VORSCHAU & SPECS -->
+        <div class="preview-box">
+          <div>
+            <h2 id="display-title" style="margin: 0; font-size: 1.8rem;">-</h2>
+            <p id="display-subtitle" style="color: var(--text-muted); margin: 4px 0 0 0; font-size: 0.85rem;">-</p>
+          </div>
+          
+          <!-- THREE.JS 3D STAGE -->
+          <div class="car-stage-3d">
+            <div id="canvas-container"></div>
+            <div class="controls-hint">🖱️ Drag to rotate | Scroll to zoom</div>
+          </div>
+
+          <div>
+            <div class="price-container">
+              <div class="price-label">Gesamtsumme inkl. MwSt.</div>
+              <div class="total-price"><span id="display-price">0</span> €</div>
+              <div class="leasing-hint">Leasing ab <strong id="display-leasing">0</strong> € / Monat</div>
+            </div>
+
+            <div class="specs-grid">
+              <div class="spec-card">
+                <span>0-100 km/h</span>
+                <strong id="spec-acc">-</strong>
+              </div>
+              <div class="spec-card">
+                <span>Höchstspeed</span>
+                <strong id="spec-speed">-</strong>
+              </div>
+              <div class="spec-card">
+                <span>Antrieb</span>
+                <strong id="spec-drive">-</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECHTS: SELEKTOREN -->
+        <div class="selection-box">
+          <div class="section-title">Konfiguration</div>
+
+          <div class="form-group">
+            <label for="car-select">Modell wählen</label>
+            <select id="car-select" onchange="updateConfigurator()"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="engine-select">Antriebsstrang</label>
+            <select id="engine-select" onchange="calculatePrice()"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="color-select">Exterieur-Lackierung (3D-Material)</label>
+            <select id="color-select" onchange="calculatePrice()"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="wheels-select">Räder & Felgen</label>
+            <select id="wheels-select" onchange="calculatePrice()"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="interior-select">Interieur & Materialien</label>
+            <select id="interior-select" onchange="calculatePrice()"></select>
+          </div>
+
+          <div class="form-group">
+            <label>Zusatzpakete</label>
+            <div id="packages-list" class="checkbox-group"></div>
+          </div>
+
+          <button class="btn-primary" onclick="alert('3D-Konfiguration erfolgreich gespeichert!')">Fahrzeug anfragen</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LOGIK & THREE.JS SETUP -->
+    <script>
+      const carsData = <%- JSON.stringify(list) %>;
+
+      // THREE.JS GLOBALE VARIABLEN
+      let scene, camera, renderer, controls;
+      let currentCarGroup = null;
+      let carBodyMaterial = null;
+
+      // INITIALISIERE THREE.JS BÜHNE
+      function init3DStage() {
+        const container = document.getElementById('canvas-container');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+
+        // Szene
+        scene = new THREE.Scene();
+
+        // Kamera
+        camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
+        camera.position.set(4, 2, 5);
+
+        // Renderer mit Antialiasing und Schatten
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // OrbitControls für Interaktion
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05; // Verhindert Bewegung unter den Boden
+        controls.minDistance = 3;
+        controls.maxDistance = 8;
+
+        // Lichtquellen
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(5, 8, 5);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+
+        const blueRimLight = new THREE.DirectionalLight(0x00d2ff, 1.5);
+        blueRimLight.position.set(-5, 3, -5);
+        scene.add(blueRimLight);
+
+        // Boden-Grid / Podest
+        const gridHelper = new THREE.GridHelper(10, 20, 0x00d2ff, 0x222233);
+        gridHelper.position.y = -0.01;
+        scene.add(gridHelper);
+
+        // Resize Listener
+        window.addEventListener('resize', onWindowResize);
+
+        // Animation-Loop starten
+        animate();
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if(controls) controls.update();
+        if(currentCarGroup) {
+          currentCarGroup.rotation.y += 0.002; // Langsame Autorotation
+        }
+        renderer.render(scene, camera);
+      }
+
+      function onWindowResize() {
+        const container = document.getElementById('canvas-container');
+        if(!container) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+
+      // PROZEDURALES 3D-AUTOMODELL GENERIEREN
+      function create3DCar(colorHex, type) {
+        if(currentCarGroup) scene.remove(currentCarGroup);
+
+        currentCarGroup = new THREE.Group();
+
+        // Karosserie-Material (Metallic)
+        carBodyMaterial = new THREE.MeshPhysicalMaterial({
+          color: new THREE.Color(colorHex),
+          metalness: 0.8,
+          roughness: 0.2,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.1
+        });
+
+        const glassMaterial = new THREE.MeshPhysicalMaterial({
+          color: 0x111122,
+          transparent: true,
+          opacity: 0.6,
+          metalness: 0.9,
+          roughness: 0.1
+        });
+
+        const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
+        const rimMaterial = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.1 });
+
+        // Karosserie-Form (Hauptblock)
+        let bodyGeo = new THREE.BoxGeometry(2.2, 0.6, 1.1);
+        let cabinGeo = new THREE.BoxGeometry(1.2, 0.45, 0.9);
+
+        // Anpassung je nach Typ
+        if(type.includes('Hypercar')) {
+          bodyGeo = new THREE.BoxGeometry(2.4, 0.45, 1.2);
+          cabinGeo = new THREE.BoxGeometry(1.0, 0.35, 0.85);
+        } else if(type.includes('SUV')) {
+          bodyGeo = new THREE.BoxGeometry(2.3, 0.8, 1.25);
+          cabinGeo = new THREE.BoxGeometry(1.4, 0.6, 1.1);
+        }
+
+        const bodyMesh = new THREE.Mesh(bodyGeo, carBodyMaterial);
+        bodyMesh.position.y = 0.4;
+        bodyMesh.castShadow = true;
+        currentCarGroup.add(bodyMesh);
+
+        const cabinMesh = new THREE.Mesh(cabinGeo, glassMaterial);
+        cabinMesh.position.set(-0.1, bodyMesh.position.y + (type.includes('SUV') ? 0.6 : 0.4), 0);
+        cabinMesh.castShadow = true;
+        currentCarGroup.add(cabinMesh);
+
+        // 4 Räder
+        const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.18, 24);
+        wheelGeo.rotateX(Math.PI / 2);
+
+        const rimGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.19, 12);
+        rimGeo.rotateX(Math.PI / 2);
+
+        const wheelPositions = [
+          [0.7, 0.28, 0.58],
+          [0.7, 0.28, -0.58],
+          [-0.7, 0.28, 0.58],
+          [-0.7, 0.28, -0.58]
+        ];
+
+        wheelPositions.forEach(pos => {
+          const wheel = new THREE.Mesh(wheelGeo, wheelMaterial);
+          const rim = new THREE.Mesh(rimGeo, rimMaterial);
+          wheel.position.set(...pos);
+          rim.position.set(...pos);
+          wheel.castShadow = true;
+          currentCarGroup.add(wheel);
+          currentCarGroup.add(rim);
+        });
+
+        scene.add(currentCarGroup);
+      }
+
+      // UI & SELEKTOR LOGIK
+      function populateCarSelect() {
+        const select = document.getElementById('car-select');
+        select.innerHTML = '';
+        carsData.forEach((car, index) => {
+          const opt = document.createElement('option');
+          opt.value = index;    
+          opt.text = `${car.brand} ${car.model}`;
+          select.appendChild(opt);
+        });
+      }
+
+      function updateConfigurator() {
+        const carIndex = document.getElementById('car-select').value;
+        const car = carsData[carIndex];
+
+        document.getElementById('display-title').innerText = car.brand + " " + car.model;
+        document.getElementById('display-subtitle').innerText = car.bodyType;
+        document.getElementById('spec-acc').innerText = car.specs.acceleration;
+        document.getElementById('spec-speed').innerText = car.specs.topSpeed;
+        document.getElementById('spec-drive').innerText = car.specs.driveTrain;
+
+        fillSelect('engine-select', car.engineOptions);
+        fillSelect('color-select', car.colors, true);
+        fillSelect('wheels-select', car.wheels);
+        fillSelect('interior-select', car.interiors);
+
+        const pkgContainer = document.getElementById('packages-list');
+        pkgContainer.innerHTML = '';
+        car.packages.forEach((pkg) => {
+          pkgContainer.innerHTML += `
+            <label class="checkbox-item">
+              <span>${pkg.name}</span>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <small style="color:var(--text-muted);">+${pkg.price.toLocaleString('de-DE')} €</small>
+                <input type="checkbox" class="pkg-checkbox" value="${pkg.price}" onchange="calculatePrice()">
+              </div>
+            </label>
+          `;
+        });
+
+        // Erstelle neues 3D Auto
+        const initialColor = car.colors[0]?.hex || "#111111";
+        create3DCar(initialColor, car.bodyType);
+
+        calculatePrice();
+      }
+
+      function fillSelect(elementId, items, isColor = false) {
+        const select = document.getElementById(elementId);
+        select.innerHTML = '';
+        items.forEach((item) => {
+          const priceText = item.price > 0 ? ` (+${item.price.toLocaleString('de-DE')} €)` : ' (Inklusive)';
+          const option = document.createElement('option');
+          option.value = item.price;
+          option.text = item.name + priceText;
+          if(isColor) option.dataset.hex = item.hex;
+          select.appendChild(option);
+        });
+      }
+
+      function calculatePrice() {
+        const carIndex = document.getElementById('car-select').value;
+        const car = carsData[carIndex];
+
+        let total = car.basePrice;
+        total += parseInt(document.getElementById('engine-select').value || 0);
+        
+        // 3D-Farbe in der Szene anpassen
+        const colorSelect = document.getElementById('color-select');
+        total += parseInt(colorSelect.value || 0);
+        const selectedColorHex = colorSelect.options[colorSelect.selectedIndex]?.dataset.hex;
+        if(selectedColorHex && carBodyMaterial) {
+          carBodyMaterial.color.set(selectedColorHex);
+        }
+
+        total += parseInt(document.getElementById('wheels-select').value || 0);
+        total += parseInt(document.getElementById('interior-select').value || 0);
+
+        const checkboxes = document.querySelectorAll('.pkg-checkbox:checked');
+        checkboxes.forEach(cb => { total += parseInt(cb.value); });
+
+        document.getElementById('display-price').innerText = total.toLocaleString('de-DE');
+        
+        const leasingRate = Math.round(total * 0.011);
+        document.getElementById('display-leasing').innerText = leasingRate.toLocaleString('de-DE');
+      }
+
+      window.onload = () => {
+        init3DStage();
+        populateCarSelect();
+        updateConfigurator();
+      };
+    </script>
+  </body>
+</html>

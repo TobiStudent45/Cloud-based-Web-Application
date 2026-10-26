@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria Dynamics | 3D Hyper-Konfigurator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Three.js & OrbitControls für interaktive 3D-Darstellung -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+      :root {
+        --bg-dark: #0a0c10;
+        --card-bg: rgba(22, 27, 34, 0.8);
+        --accent-blue: #00d2ff;
+        --accent-glow: rgba(0, 210, 255, 0.35);
+        --text-main: #f0f6fc;
+        --text-muted: #8b949e;
+        --border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+        transition: background 0.25s, border-color 0.25s, transform 0.25s;
+      }
+
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: 0;
+        padding: 30px;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        background-image: 
+          radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+          radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.08) 0%, transparent 40%);
+      }
+
+      .container {
+        max-width: 1440px;
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 0;
+        background: linear-gradient(135deg, #fff 30%, var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .header p {
+        color: var(--text-muted);
+        margin-top: 6px;
+        font-size: 0.95rem;
+      }
+      
+      .main-nav {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 35px;
+        flex-wrap: wrap;
+        background: rgba(22, 27, 34, 0.8);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 12px 20px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .main-nav a {
+        color: #8b949e;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        transition: all 0.25s ease;
+    }
+
+  .main-nav a:hover, .main-nav a.active {
+    color: #fff;
+    background: rgba(0, 210, 255, 0.1);
+    border-color: #00d2ff;
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.35);
+  }
+      
+      .configurator-grid {
+        display: grid;
+        grid-template-columns: 1fr 440px;
+        gap: 30px;
+      }
+
+      @media (max-width: 1024px) {
+        .configurator-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Linke Seite: 3D Stage & Stats */
+      .preview-box {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .preview-box::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+      }
+
+      /* 3D Canvas Container */
+      .car-stage-3d {
+        width: 100%;
+        height: 380px;
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        margin: 15px 0;
+        background: radial-gradient(circle at center, #1a2230 0%, #0a0c10 90%);
+        border: 1px solid rgba(255,255,255,0.05);
+        cursor: grab;
+      }
+
+      .car-stage-3d:active {
+        cursor: grabbing;
+      }
+
+      #canvas-container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .controls-hint {
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.6);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        pointer-events: none;
+        border: 1px solid var(--border-color);
+      }
+
+      .price-container {
+        text-align: center;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+      }
+
+      .price-label {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+
+      .total-price {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 4px 0;
+        text-shadow: 0 0 20px var(--accent-glow);
+      }
+
+      .leasing-hint {
+        font-size: 0.85rem;
+        color: var(--accent-blue);
+      }
+
+      .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .spec-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .spec-card span {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+      }
+
+      .spec-card strong {
+        font-size: 0.9rem;
+        color: #fff;
+      }
+
+      /* Rechte Seite: Konfiguration */
+      .selection-box {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title::before {
+        content: '';
+        width: 4px;
+        height: 18px;
+        background: var(--accent-blue);
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--accent-blue);
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+
+      select {
+        width: 100%;
+        padding: 12px;
+        background: rgba(10, 12, 16, 0.85);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: #fff;
+        font-family: inherit;
+        font-size: 0.9rem;
+        outline: none;
+        cursor: pointer;
+      }
+
+      select:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 12px var(--accent-glow);
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .checkbox-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(10, 12, 16, 0.5);
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        font-size: 0.85rem;
+      }
+
+      .checkbox-item:hover {
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.03);
+      }
+
+      .checkbox-item input[type="checkbox"] {
+        accent-color: var(--accent-blue);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--accent-blue), #0072ff);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        margin-top: 15px;
+        box-shadow: 0 10px 20px var(--accent-glow);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px var(--accent-glow);
+      }
+    </style>
+  </head>
+  <body>
+<div class="container">
+      <div class="header">
+        <h1>AETHERIA DYNAMICS</h1>
+        <p>Interaktives 3D-Realtime Studio</p>
+      </div>
+      <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/configurator">Konfigurator</a>
+        <a href="/merchandise">Merchandise</a>
+        <a href="/impressions">Impressionen</a>
+        <a href="/road2supercar">Road 2 Supercar</a>
+        <a href="/you">You</a>
+      </nav>
+    <div class="container">
+        <%- body %>
+    </div>
+  </body>
+</html>
