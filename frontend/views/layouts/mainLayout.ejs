@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %> | Aetheria Dynamics</title>
+  <link rel="stylesheet" href="/css/theme.css" />
+  <!-- Seiten-eigenes CSS optional: /css/<view>.css -->
+</head>
+<body>
+  <header class="site-header">
+    <div class="inner">
+      <span class="brand">Aetheria Dynamics</span>
+      <nav class="main-nav">
+        <% nav.forEach(function (item) { %>
+          <a href="<%= item.path %>" class="<%= currentPath === item.path ? 'active' : '' %>"><%= item.label %></a>
+        <% }); %>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <%- body %>
+  </main>
+</body>
+</html>

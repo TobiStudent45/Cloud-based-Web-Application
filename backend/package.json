@@ -1,0 +1,13 @@
+{
+  "name": "backend-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway - routet /api/<service>/... an die jeweiligen Microservices",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6"
+  }
+}

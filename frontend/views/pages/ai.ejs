@@ -1,0 +1,15 @@
+<%
+  // Stub: `data` = Gateway-Antwort, `apiError` = Fehler falls Service down.
+%>
+<section class="card">
+  <h1>AI Feature</h1>
+  <p class="muted">Kreatives AI-Feature mit Google Gemini.</p>
+</section>
+
+<% if (apiError) { %>
+  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
+<% } else if (data) { %>
+  <pre class="stub-note" style="overflow:auto"><%= JSON.stringify(data, null, 2) %></pre>
+<% } else { %>
+  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
+<% } %>

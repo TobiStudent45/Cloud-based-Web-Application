@@ -1,0 +1,12 @@
+{
+  "name": "service-road2supercar",
+  "version": "1.0.0",
+  "description": "Microservice: road2supercar",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

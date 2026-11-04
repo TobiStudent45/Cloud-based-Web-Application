@@ -1,0 +1,100 @@
+/* ───────────────────────────────────────────────────────────
+   Zentrales Design-System. Einzige Quelle fuer Farben, Abstaende,
+   Cards, Buttons, Navigation. Service-Seiten nutzen diese Klassen,
+   damit das Styling nicht an mehreren Orten gepflegt werden muss.
+   ─────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #0f1115;
+  --surface: #181b21;
+  --surface-2: #20242c;
+  --border: #2a2f38;
+  --text: #e8eaed;
+  --text-muted: #9aa3af;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --radius: 10px;
+  --gap: 20px;
+  --maxw: 1200px;
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+
+/* Layout-Rahmen */
+.page { max-width: var(--maxw); margin: 0 auto; padding: 24px; }
+
+/* Kopfzeile + Navigation */
+.site-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.site-header .inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.brand { font-weight: 700; font-size: 1.1rem; color: var(--text); white-space: nowrap; }
+.main-nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.main-nav a {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+}
+.main-nav a:hover { color: var(--text); background: var(--surface-2); }
+.main-nav a.active { color: #fff; background: var(--accent); }
+
+/* Bausteine */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--gap);
+}
+.grid {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+.btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:hover { background: var(--accent-hover); color: #fff; }
+
+.muted { color: var(--text-muted); }
+h1 { font-size: 1.8rem; margin: 0 0 8px; }
+h2 { font-size: 1.3rem; margin: 0 0 8px; }
+
+/* Hinweis-/Platzhalterbox fuer Service-Stubs */
+.stub-note {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  background: var(--surface-2);
+}

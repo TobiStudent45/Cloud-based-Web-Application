@@ -1,0 +1,27 @@
+# ── Node ────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Secrets / Umgebung ──────────────────────────────────
+.env
+.env.local
+*.local
+
+# ── Logs ────────────────────────────────────────────────
+logs/
+*.log
+
+# ── Docker ──────────────────────────────────────────────
+# Lokale Override-Dateien nicht einchecken
+compose.override.yml
+docker-compose.override.yml
+
+# ── OS / Editor ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/

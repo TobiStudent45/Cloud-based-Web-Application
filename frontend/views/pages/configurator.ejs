@@ -1,0 +1,20 @@
+<%
+  // Stub: Daten kommen als `data` vom Gateway (siehe config/pages.js -> api).
+  // `apiError` ist gesetzt, falls der Service (noch) nicht erreichbar ist.
+  // Dieses Muster fuer jede Service-Seite kopieren.
+%>
+<section class="card">
+  <h1>Konfigurator</h1>
+  <p class="muted">Fahrzeuge grafisch konfigurieren und bestellen.</p>
+</section>
+
+<% if (apiError) { %>
+  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
+<% } else if (data) { %>
+  <pre class="stub-note" style="overflow:auto"><%= JSON.stringify(data, null, 2) %></pre>
+<% } else { %>
+  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
+<% } %>
+
+<!-- Seiten-eigenes JS optional einbinden:
+     <script src="/js/configurator.js"></script> -->
