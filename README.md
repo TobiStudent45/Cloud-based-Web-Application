@@ -16,5 +16,6 @@ docker compose up --build
 | Web-App | http://localhost |
 | phpMyAdmin | http://localhost:8081 |
 | Redis Commander | http://localhost:8082 |
+| MinIO Console | http://localhost:9001 |
 
 Login: `hhzadmin` / `hhzadmin`
