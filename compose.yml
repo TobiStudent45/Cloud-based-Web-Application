@@ -8,7 +8,8 @@ services:
     environment:
       GATEWAY_URL: http://backend:3000
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     networks: [app-net]
 
   # API Gateway
@@ -28,22 +29,60 @@ services:
   # Business Logic Tier
   configurator:
     build: ./services/configurator
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: carmanufacturer
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks: [app-net]
 
   product-info:
     build: ./services/product-info
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: carmanufacturer
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks: [app-net]
 
   merchandise:
     build: ./services/merchandise
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: carmanufacturer
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks: [app-net]
 
   cart:
     build: ./services/cart
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      redis:
+        condition: service_healthy
     networks: [app-net]
 
   orders:
     build: ./services/orders
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: carmanufacturer
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks: [app-net]
 
   impressions:
@@ -56,6 +95,8 @@ services:
 
   ai:
     build: ./services/ai
+    environment:
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     networks: [app-net]
 
   # Data Tier
@@ -67,8 +108,13 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
-      # TODO: Startskript einhängen, sobald db/mysql/init.sql existiert:
-      # - ./db/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks: [app-net]
 
   mysql-admin:
@@ -79,11 +125,19 @@ services:
       PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "8081:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks: [app-net]
 
   redis:
     image: redis:7-alpine
     volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     networks: [app-net]
 
   redis-admin:
@@ -92,13 +146,13 @@ services:
       REDIS_HOSTS: local:redis:6379
     ports:
       - "8082:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
     networks: [app-net]
 
-  # MinIO (Object Storage, S3-API) – vorerst deaktiviert:
-  # Image-Pull wird in dieser Umgebung vom Proxy blockiert.
-  # Zum Reaktivieren Block einkommentieren + minio-data-Volume unten.
   # minio:
-  #   image: minio/minio:RELEASE.2024-01-16T16-07-38Z
+  #   image: quay.io/minio/minio:latest
   #   command: server /data --console-address ":9001"
   #   environment:
   #     MINIO_ROOT_USER: ${MINIO_ROOT_USER}
