@@ -1,7 +1,7 @@
 {
-  "name": "service-product-info",
+  "name": "service-productinfo",
   "version": "1.0.0",
-  "description": "Microservice: product-info",
+  "description": "Microservice: productinfo",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

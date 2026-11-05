@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 3000;
 // ──────────────────────────────────────────────────────────────
 const SERVICES = {
   configurator:    process.env.CONFIGURATOR_URL    || "http://configurator:3000",
-  "product-info":  process.env.PRODUCT_INFO_URL    || "http://product-info:3000",
+  productinfo:     process.env.PRODUCT_INFO_URL    || "http://productinfo:3000",
   merchandise:     process.env.MERCHANDISE_URL     || "http://merchandise:3000",
   cart:            process.env.CART_URL            || "http://cart:3000",
   orders:          process.env.ORDERS_URL          || "http://orders:3000",

@@ -17,7 +17,7 @@ services:
     build: ./backend
     depends_on:
       - configurator
-      - product-info
+      - productinfo
       - merchandise
       - cart
       - orders
@@ -39,8 +39,8 @@ services:
         condition: service_healthy
     networks: [app-net]
 
-  product-info:
-    build: ./services/product-info
+  productinfo:
+    build: ./services/productinfo
     environment:
       MYSQL_HOST: mysql
       MYSQL_USER: ${MYSQL_USER}
