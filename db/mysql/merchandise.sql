@@ -65,7 +65,7 @@ INSERT INTO products (sku, name, short_description, description, category, price
    'Shopper aus schwarzem Glattleder mit zwei stabilen Henkeln und Innenfach mit Reißverschluss. Bietet Platz für Laptop, Dokumente und alles für die Fahrt.',
    'Accessoires', 219.00, 10, 'Schwarz', NULL, 'marlon-silva-3lOrwq1JMfM-unsplash.jpg', TRUE),
 
-  ('AD-PST-001', 'Poster "Black Classic"',
-   'Fotodruck eines klassischen Sportwagens.',
-   'Hochwertiger Fotodruck (50 × 70 cm) eines schwarzen klassischen Sportwagens in urbaner Kulisse, auf 200 g/m² Fine-Art-Papier. Ohne Rahmen.',
-   'Lifestyle', 29.90, 5, 'Schwarz/Weiß', NULL, 'rick-gebhardt-n52K1_3aZDE-unsplash.jpg', FALSE);
+  ('AD-PST-001', 'Poster Golden Hour',
+   'Fotodruck eines Supersportwagens im Abendlicht.',
+   'Hochwertiger Fotodruck (50 × 70 cm) eines weißen Supersportwagens mit Heckflügel im warmen Licht der untergehenden Sonne, auf 200 g/m² Fine-Art-Papier. Ohne Rahmen.',
+   'Lifestyle', 29.90, 5, 'Weiß/Gold', NULL, 'pexels-wearelivingart-8237006.jpg', FALSE);
