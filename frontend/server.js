@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Navigation steht in allen Views zur Verfuegung (res.locals)
 app.use((req, res, next) => {
-  res.locals.nav = pages;
+  res.locals.nav = pages.filter((p) => p.nav !== false);
   res.locals.currentPath = req.path;
   next();
 });

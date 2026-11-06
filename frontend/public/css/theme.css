@@ -60,6 +60,18 @@ a:hover { color: var(--accent-hover); }
 .main-nav a:hover { color: var(--text); background: var(--surface-2); }
 .main-nav a.active { color: #fff; background: var(--accent); }
 
+/* Warenkorb-Symbol oben rechts */
+.cart-link {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+.cart-link:hover { color: var(--text); background: var(--surface-2); }
+.cart-link.active { color: #fff; background: var(--accent); }
+
 /* Bausteine */
 .card {
   background: var(--surface);
