@@ -1,15 +1,90 @@
 <%
-  // Stub: `data` = Gateway-Antwort, `apiError` = Fehler falls Service down.
+  // Eine View fuer beides: Uebersicht (/merchandise) und Detail (/merchandise/:id)
+  const isDetail = Boolean(locals.backPath);
+  const formatPrice = (p) =>
+    new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(p);
 %>
-<section class="card">
-  <h1>Merchandise</h1>
-  <p class="muted">Artikel im Web-Shop mit Warenkorb kaufen.</p>
-</section>
+<% if (isDetail) { %>
+  <a href="<%= backPath %>" class="back-link">← Weitere Artikel</a>
+<% } %>
 
 <% if (apiError) { %>
-  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
-<% } else if (data) { %>
-  <pre class="stub-note" style="overflow:auto"><%= JSON.stringify(data, null, 2) %></pre>
+  <div class="stub-note">Produkt<%= isDetail ? "" : "e" %> konnte<%= isDetail ? "" : "n" %> nicht geladen werden: <%= apiError %></div>
+
+<% } else if (!isDetail) { %>
+  <% if (!data || data.length === 0) { %>
+    <div class="stub-note">Aktuell keine Produkte vorhanden.</div>
+  <% } else { %>
+    <div class="grid product-grid">
+      <% data.forEach(function (p) { %>
+        <a href="/merchandise/<%= p.id %>" class="card product-card" data-vt>
+          <% if (p.image_url) { %>
+            <img src="<%= p.image_url %>" alt="<%= p.name %>" />
+          <% } %>
+          <h2><%= p.name %></h2>
+          <p class="price"><%= formatPrice(p.price) %></p>
+        </a>
+      <% }); %>
+    </div>
+  <% } %>
+
 <% } else { %>
-  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
+  <section class="card product-detail">
+    <% if (data.image_url) { %>
+      <img src="<%= data.image_url %>" alt="<%= data.name %>" style="view-transition-name: product-img" />
+    <% } %>
+
+    <div class="product-info">
+      <p class="muted"><%= data.category %></p>
+      <h1><%= data.name %></h1>
+      <p class="price"><%= formatPrice(data.price) %></p>
+      <p><%= data.short_description %></p>
+      <p class="muted"><%= data.description %></p>
+
+      <% if (data.color) { %>
+        <dl class="product-facts">
+          <dt>Farbe</dt><dd><%= data.color %></dd>
+        </dl>
+      <% } %>
+
+      <%# TODO Warenkorb: Formular an den Cart-Service anbinden (productId, size, quantity) %>
+      <form class="add-to-cart" onsubmit="return false">
+        <input type="hidden" name="productId" value="<%= data.id %>" />
+        <% if (data.sizes && data.sizes.length) { %>
+          <label>Größe
+            <select name="size" required>
+              <% data.sizes.forEach(function (s) { %>
+                <option value="<%= s %>"><%= s %></option>
+              <% }); %>
+            </select>
+          </label>
+        <% } %>
+        <% const maxQty = Math.max(data.stock, 1); %>
+        <label>Menge
+          <select name="quantity" class="qty-select">
+            <% for (let i = 1; i <= Math.min(10, maxQty); i++) { %>
+              <option value="<%= i %>"><%= i %></option>
+            <% } %>
+            <% if (maxQty > 10) { %><option value="more">mehr …</option><% } %>
+          </select>
+          <input type="number" class="qty-input" min="1" max="<%= maxQty %>" value="11" hidden disabled />
+        </label>
+        <button type="submit" class="btn" <%= data.in_stock ? "" : "disabled" %>>
+          <%= data.in_stock ? "In den Warenkorb" : "Ausverkauft" %>
+        </button>
+      </form>
+      <script>
+        // "mehr …" gewaehlt: Auswahlfeld durch Eingabefeld ersetzen
+        document.querySelector(".qty-select").addEventListener("change", (e) => {
+          if (e.target.value !== "more") return;
+          const input = e.target.nextElementSibling;
+          e.target.hidden = e.target.disabled = true;
+          input.hidden = input.disabled = false;
+          input.name = "quantity";
+          input.focus();
+          input.select();
+        });
+      </script>
+    </div>
+  </section>
 <% } %>

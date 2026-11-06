@@ -8,7 +8,8 @@ const express = require("express");
 const layouts = require("express-ejs-layouts");
 const path = require("path");
 const pages = require("./config/pages");
-const { fetchFromGateway } = require("./lib/gateway");
+const { Readable } = require("stream");
+const { fetchFromGateway, GATEWAY_URL } = require("./lib/gateway");
 
 const app = express();
 const PORT = process.env.PORT || 80;
@@ -26,6 +27,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// /api/... an das Gateway weiterleiten (z. B. Produktbilder)
+app.get("/api/*", async (req, res) => {
+  try {
+    const upstream = await fetch(`${GATEWAY_URL}${req.originalUrl}`, { signal: AbortSignal.timeout(10000) });
+    res.status(upstream.status);
+    for (const h of ["content-type", "content-length", "cache-control"]) {
+      const v = upstream.headers.get(h);
+      if (v) res.set(h, v);
+    }
+    if (!upstream.body) return res.end();
+    Readable.fromWeb(upstream.body).pipe(res);
+  } catch (err) {
+    res.status(502).json({ error: "Gateway nicht erreichbar", message: err.message });
+  }
+});
+
 // Eine Route pro Config-Eintrag
 for (const page of pages) {
   app.get(page.path, async (req, res) => {
@@ -38,6 +55,23 @@ for (const page of pages) {
     }
     res.render(`pages/${page.view}`, { title: page.label, data, apiError });
   });
+
+  if (page.detail) {
+    app.get(`${page.path}/:id`, async (req, res) => {
+      const result = await fetchFromGateway(page.detail.api.replace(":id", encodeURIComponent(req.params.id)));
+      if (!result.ok && ["Status 400", "Status 404"].includes(result.error)) {
+        return res.status(404).render(`pages/${page.detail.view}`, {
+          title: page.label, data: null, apiError: "Nicht gefunden", backPath: page.path,
+        });
+      }
+      res.render(`pages/${page.detail.view}`, {
+        title: result.data?.name || page.label,
+        data: result.data,
+        apiError: result.ok ? null : result.error,
+        backPath: page.path,
+      });
+    });
+  }
 }
 
 app.listen(PORT, () => console.log(`[frontend] Web-UI laeuft auf Port ${PORT}`));
