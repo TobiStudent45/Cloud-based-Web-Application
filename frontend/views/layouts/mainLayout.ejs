@@ -6,6 +6,30 @@
   <title><%= title %> | Aetheria Dynamics</title>
   <link rel="stylesheet" href="/css/theme.css" />
   <!-- Seiten-eigenes CSS optional: /css/<view>.css -->
+  <script>
+    // Seitenuebergang: nur das angeklickte Bild (data-vt) fliegt zur Detailseite
+    // Name darf immer nur an einem Bild haengen, sonst bricht der Browser ab
+    const clearNames = () =>
+      document.querySelectorAll("a[data-vt] img").forEach((img) => (img.style.viewTransitionName = ""));
+
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest("a[data-vt]");
+      const img = link && link.querySelector("img");
+      if (!img) return;
+      clearNames();
+      img.style.viewTransitionName = "product-img";
+    });
+    // Zurueck zur Uebersicht: das Bild des zuletzt geoeffneten Produkts markieren
+    window.addEventListener("pagereveal", (e) => {
+      clearNames();
+      const from = window.navigation?.activation?.from?.url;
+      if (!e.viewTransition || !from) return;
+      const img = document.querySelector(`a[data-vt][href="${new URL(from).pathname}"] img`);
+      if (!img) return;
+      img.style.viewTransitionName = "product-img";
+      e.viewTransition.finished.finally(clearNames);
+    });
+  </script>
 </head>
 <body>
   <header class="site-header">
@@ -13,7 +37,7 @@
       <span class="brand">Aetheria Dynamics</span>
       <nav class="main-nav">
         <% nav.forEach(function (item) { %>
-          <a href="<%= item.path %>" class="<%= currentPath === item.path ? 'active' : '' %>"><%= item.label %></a>
+          <a href="<%= item.path %>" class="<%= currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path + '/')) ? 'active' : '' %>"><%= item.label %></a>
         <% }); %>
       </nav>
       <a href="/shoppingcart" class="cart-link <%= currentPath === '/shoppingcart' ? 'active' : '' %>" aria-label="Warenkorb" title="Warenkorb">

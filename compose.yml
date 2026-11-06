@@ -57,10 +57,20 @@ services:
       MYSQL_HOST: mysql
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: carmanufacturer
+      MYSQL_DATABASE: merchandise
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: merchandise
+    volumes:
+      # Startbilder, werden beim Start in den Bucket hochgeladen
+      - ./db/minio/merchandise:/app/seed-images:ro
     depends_on:
       mysql:
         condition: service_healthy
+      minio:
+        condition: service_started
     networks: [app-net]
 
   cart:
@@ -109,6 +119,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./db/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/mysql/merchandise.sql:/docker-entrypoint-initdb.d/merchandise.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
@@ -121,8 +132,6 @@ services:
     image: phpmyadmin:latest
     environment:
       PMA_HOST: mysql
-      PMA_USER: ${MYSQL_USER}
-      PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8081:80"
     depends_on:
