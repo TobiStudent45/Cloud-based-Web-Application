@@ -1,15 +1,116 @@
-<%
-  // Stub: `data` = Gateway-Antwort, `apiError` = Fehler falls Service down.
-%>
-<section class="card">
-  <h1>Impressionen</h1>
-  <p class="muted">Bilder und Videos einiger Fahrzeuge.</p>
+<div class="impressions-bar">
+  <a href="#bilder" class="btn impressions-jump">Zu den Bildern</a>
+  <a href="/configurator" class="btn impressions-jump cta-config">Jetzt dein Traumauto konfigurieren</a>
+</div>
+
+<section class="impressions-video">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/Su7cGCX_mq4?start=106&autoplay=1&mute=1&cc_load_policy=0&rel=0&playsinline=1"
+    title="Lamborghini Video"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>
 </section>
 
-<% if (apiError) { %>
-  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
-<% } else if (data) { %>
-  <pre class="stub-note" style="overflow:auto"><%= JSON.stringify(data, null, 2) %></pre>
-<% } else { %>
-  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
-<% } %>
+<section id="bilder" class="grid impressions-grid">
+  <% if (Array.isArray(data) && data.length) { %>
+    <% data.forEach(function (img) { %>
+      <figure class="card impression-placeholder">
+        <img class="impression-img" src="<%= img.url %>" alt="Lamborghini" loading="lazy" />
+      </figure>
+    <% }); %>
+  <% } else { %>
+    <% for (let i = 1; i <= 6; i++) { %>
+      <figure class="card impression-placeholder">
+        <div class="impression-img">Bild <%= i %></div>
+        <figcaption>Lamborghini – Bild folgt</figcaption>
+      </figure>
+    <% } %>
+  <% } %>
+</section>
+
+<script>
+  // Konfigurator-Button wandert beim Scrollen nach oben rechts und bleibt dort
+  (() => {
+    const orig = document.querySelector(".cta-config");
+    const pin = orig.cloneNode(true);
+    pin.classList.add("cta-pinned");
+    pin.hidden = true;
+    document.body.append(pin);
+    let pinned = false;
+
+    const update = () => {
+      const top = document.querySelector(".site-header").offsetHeight + 16;
+      pin.style.top = top + "px";
+      const r = orig.getBoundingClientRect();
+      if ((r.top < top) === pinned) return;
+      pinned = !pinned;
+      pin.hidden = false;
+      const p = pin.getBoundingClientRect();
+      const from = `translate(${r.left - p.left}px, ${r.top - p.top}px)`;
+      if (pinned) {
+        orig.style.visibility = "hidden";
+        pin.animate([{ transform: from }, { transform: "none" }], { duration: 600, easing: "cubic-bezier(0.16, 1, 0.3, 1)" });
+      } else {
+        pin.animate([{ transform: "none" }, { transform: from }], { duration: 400, easing: "ease-in-out" })
+          .finished.then(() => {
+            if (pinned) return;
+            pin.hidden = true;
+            orig.style.visibility = "";
+          });
+      }
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
+</script>
+
+<div class="lightbox" hidden>
+  <div class="lightbox-bg"></div>
+  <button type="button" class="back-link lightbox-back">← Zurück zu den Bildern</button>
+  <img alt="Lamborghini" />
+</div>
+
+<script>
+  // Klick auf ein Bild: Hintergrund unscharf, Bild waechst im gleichen Ausschnitt
+  (() => {
+    const box = document.querySelector(".lightbox");
+    const big = box.querySelector("img");
+    const bg = box.querySelector(".lightbox-bg");
+    const ease = { duration: 500, easing: "cubic-bezier(0.16, 1, 0.3, 1)" };
+    let thumb = null;
+
+    const fromThumb = () => {
+      const t = thumb.getBoundingClientRect();
+      const b = big.getBoundingClientRect();
+      return `translate(${t.left - b.left}px, ${t.top - b.top}px) scale(${t.width / b.width})`;
+    };
+
+    document.querySelector("#bilder").addEventListener("click", (e) => {
+      const img = e.target.closest("img.impression-img");
+      if (!img) return;
+      thumb = img;
+      big.src = img.src;
+      box.hidden = false;
+      thumb.style.visibility = "hidden";
+      big.animate([{ transform: fromThumb() }, { transform: "none" }], ease);
+      bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+    });
+
+    const close = () => {
+      if (box.hidden || !thumb) return;
+      bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: "forwards" });
+      big.animate([{ transform: "none" }, { transform: fromThumb() }], { ...ease, duration: 400 })
+        .finished.then(() => {
+          box.hidden = true;
+          bg.getAnimations().forEach((a) => a.cancel());
+          thumb.style.visibility = "";
+          thumb = null;
+        });
+    };
+    box.querySelector(".lightbox-back").addEventListener("click", close);
+    bg.addEventListener("click", close);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  })();
+</script>

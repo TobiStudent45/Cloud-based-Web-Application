@@ -13,7 +13,7 @@ module.exports = [
   { label: "Konfigurator",  path: "/configurator",  view: "configurator",  api: "/configurator/cars" },
   { label: "Merchandise",   path: "/merchandise",   view: "merchandise",   api: "/merchandise/products",
     detail: { view: "merchandise", api: "/merchandise/products/:id" } },
-  { label: "Impressionen",  path: "/impressions",   view: "impressions",   api: "/impressions" },
+  { label: "Impressionen",  path: "/impressions",   view: "impressions",   api: "/impressions/images" },
   { label: "Road2Supercar", path: "/road2supercar", view: "road2supercar", api: "/road2supercar" },
   { label: "AI Feature",    path: "/ai",            view: "ai",            api: "/ai" },
   { label: "Warenkorb",     path: "/shoppingcart",  view: "shoppingcart",  api: "/cart",  nav: false },

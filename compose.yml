@@ -97,6 +97,18 @@ services:
 
   impressions:
     build: ./services/impressions
+    environment:
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: impressions
+    volumes:
+      # Startbilder, werden beim Start in den Bucket hochgeladen
+      - ./db/minio/impressions:/app/seed-images:ro
+    depends_on:
+      minio:
+        condition: service_started
     networks: [app-net]
 
   road2supercar:
