@@ -19,6 +19,10 @@ app.set("views", path.join(__dirname, "views"));
 app.use(layouts);
 app.set("layout", "layouts/mainLayout");
 app.use(express.static(path.join(__dirname, "public")));
+// Expose only the bundled viewer, not the entire node_modules directory.
+app.get("/vendor/model-viewer.min.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "node_modules/@google/model-viewer/dist/model-viewer.min.js"));
+});
 
 // Navigation steht in allen Views zur Verfuegung (res.locals)
 app.use((req, res, next) => {
@@ -28,17 +32,30 @@ app.use((req, res, next) => {
 });
 
 // /api/... an das Gateway weiterleiten (z. B. Produktbilder)
-app.get("/api/*", async (req, res) => {
+app.all("/api/*", async (req, res) => {
   try {
-    const upstream = await fetch(`${GATEWAY_URL}${req.originalUrl}`, { signal: AbortSignal.timeout(10000) });
+    const isModel = /^\/api\/configurator\/cars\/[^/]+\/model$/.test(req.path);
+    const headers = {};
+    for (const name of ["range", "if-range", "if-none-match", "if-modified-since", "content-type"]) {
+      if (req.headers[name]) headers[name] = req.headers[name];
+    }
+    const upstream = await fetch(`${GATEWAY_URL}${req.originalUrl}`, {
+      headers, method: req.method,
+      ...(!["GET", "HEAD"].includes(req.method) ? { body: req, duplex: "half" } : {}),
+      signal: AbortSignal.timeout(isModel ? 120000 : 10000),
+    });
     res.status(upstream.status);
-    for (const h of ["content-type", "content-length", "cache-control"]) {
+    for (const h of ["content-type", "content-length", "cache-control", "content-range", "accept-ranges", "etag", "last-modified", "location", "content-disposition"]) {
       const v = upstream.headers.get(h);
       if (v) res.set(h, v);
     }
     if (!upstream.body) return res.end();
-    Readable.fromWeb(upstream.body).pipe(res);
+    const body = Readable.fromWeb(upstream.body);
+    body.on("error", (err) => res.destroy(err));
+    res.on("close", () => body.destroy());
+    body.pipe(res);
   } catch (err) {
+    if (res.headersSent) return res.destroy(err);
     res.status(502).json({ error: "Gateway nicht erreichbar", message: err.message });
   }
 });

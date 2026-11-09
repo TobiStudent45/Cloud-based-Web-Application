@@ -16,14 +16,22 @@ services:
   backend:
     build: ./backend
     depends_on:
-      - configurator
-      - productinfo
-      - merchandise
-      - cart
-      - orders
-      - impressions
-      - road2supercar
-      - ai
+      configurator:
+        condition: service_healthy
+      productinfo:
+        condition: service_started
+      merchandise:
+        condition: service_started
+      cart:
+        condition: service_started
+      orders:
+        condition: service_started
+      impressions:
+        condition: service_started
+      road2supercar:
+        condition: service_started
+      ai:
+        condition: service_started
     networks: [app-net]
 
   # Business Logic Tier
@@ -34,6 +42,19 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: carmanufacturer
+      CATALOG_SCHEMA_PATH: /app/sql/configurator.sql
+    volumes:
+      - ./db/mysql/configurator.sql:/app/sql/configurator.sql:ro
+      - ./db/mysql/configurator-options.sql:/app/sql/configurator-options.sql:ro
+      - ./db/mysql/configurator-pricing.sql:/app/sql/configurator-pricing.sql:ro
+      - ./db/mysql/configurator-configurations.sql:/app/sql/configurator-configurations.sql:ro
+      - ./services/configurator/models:/app/models:ro
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     depends_on:
       mysql:
         condition: service_healthy

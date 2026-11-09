@@ -1,27 +1,37 @@
-# ── Node ────────────────────────────────────────────────
+# Lokale Node-Pakete in Frontend, Backend und allen Services
 node_modules/
+
+# Lokaler npm-Cache und Entwicklungsartefakte
+.npm-cache/
+
+# Lokale Umgebungsdateien; Beispielvorlagen bleiben versioniert
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.local
+
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# ── Secrets / Umgebung ──────────────────────────────────
-.env
-.env.local
-*.local
-
-# ── Logs ────────────────────────────────────────────────
-logs/
-*.log
-
-# ── Docker ──────────────────────────────────────────────
-# Lokale Override-Dateien nicht einchecken
+# Lokale Docker-Compose-Ergaenzungen
 compose.override.yml
+compose.override.yaml
 docker-compose.override.yml
+docker-compose.override.yaml
 
-# ── OS / Editor ─────────────────────────────────────────
+# Betriebssystem und Editor
 .DS_Store
 Thumbs.db
 desktop.ini
 *.swp
+*.swo
 .vscode/
 .idea/
+
+# Anwendungscode, package-lock.json, Dockerfiles, SQL-Dateien und
+# die fertigen GLB-Modelle werden bewusst NICHT ignoriert.
