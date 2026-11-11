@@ -64,10 +64,9 @@
     ticking = false;
     updateTimeline();
     if (!stage) return;
-    if (reduce) { stage.style.setProperty('--p', 1); return; }
+    if (reduce) return;
     var r = stage.getBoundingClientRect();
     var p = Math.min(1, Math.max(0, (window.innerHeight * 0.9 - r.top) / (window.innerHeight * 0.9)));
-    stage.style.setProperty('--p', p);
     stage.classList.toggle('show', p > 0.5);
   }
   function onScroll() {
