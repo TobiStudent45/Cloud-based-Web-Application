@@ -1,10 +1,4 @@
-/**
- * Microservice: road2supercar
- * -------------------
- * Minimales Gerüst. Fachlogik und Routen kommen hier rein.
- * Liefert ausschließlich JSON (keine Views!). Lauscht intern auf Port 3000
- * und wird nur über das API Gateway (/api/road2supercar/...) angesprochen.
- */
+// road2supercar microservice (stub): JSON only, internal port 3000, reached through the gateway at /api/road2supercar.
 
 const express = require("express");
 
@@ -14,12 +8,9 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const SERVICE_NAME = "road2supercar";
 
-// Health-Check – vom Gateway / Compose nutzbar
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: SERVICE_NAME });
 });
-
-// TODO: Fachliche Routen des Service hier ergänzen
 
 app.listen(PORT, () => {
   console.log(`[${SERVICE_NAME}] läuft auf Port ${PORT}`);

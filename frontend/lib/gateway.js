@@ -1,7 +1,6 @@
-// Kleiner Helfer: ruft einen Endpunkt am API Gateway ab und gibt JSON zurueck.
-// Die Web-UI spricht ausschliesslich mit dem Gateway, nie direkt mit einem Service.
-// Faellt der Abruf aus, wird { ok:false, error } geliefert, damit Seiten
-// trotzdem rendern (kein Crash, wenn ein Service noch nicht fertig ist).
+// Server-side client for the API gateway. Always resolves to { ok, error, data },
+// so pages still render when a service is unavailable.
+
 
 const GATEWAY_URL = process.env.GATEWAY_URL || "http://backend:3000";
 

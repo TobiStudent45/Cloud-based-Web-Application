@@ -1,5 +1,4 @@
 <%
-  // Eine View fuer beides: Uebersicht (/merchandise) und Detail (/merchandise/:id)
   const isDetail = Boolean(locals.backPath);
   const formatPrice = (p) =>
     new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(p);
@@ -74,7 +73,6 @@
         </button>
       </form>
       <script>
-        // "mehr …" gewaehlt: Auswahlfeld durch Eingabefeld ersetzen
         document.querySelector(".qty-select").addEventListener("change", (e) => {
           if (e.target.value !== "more") return;
           const input = e.target.nextElementSibling;

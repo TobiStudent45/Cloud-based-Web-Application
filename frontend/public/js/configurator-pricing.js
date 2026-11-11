@@ -152,7 +152,6 @@ export function createPricing(root) {
         const url = new URL(open.href);
         history.replaceState(null, "", url.pathname + url.search);
         message("Gespeichert. Du kannst die Konfiguration wieder öffnen oder als JSON herunterladen.");
-        // The saved price is calculated again on the server, including catalog changes.
         quote = snapshot;
         renderQuote(snapshot);
       }

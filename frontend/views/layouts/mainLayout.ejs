@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title %> | Aetheria Dynamics</title>
   <link rel="stylesheet" href="/css/theme.css" />
-  <!-- Seiten-eigenes CSS optional: /css/<view>.css -->
   <script>
-    // Seitenuebergang: nur das angeklickte Bild (data-vt) fliegt zur Detailseite
-    // Name darf immer nur an einem Bild haengen, sonst bricht der Browser ab
     const clearNames = () =>
       document.querySelectorAll("a[data-vt] img").forEach((img) => (img.style.viewTransitionName = ""));
 
@@ -19,7 +16,6 @@
       clearNames();
       img.style.viewTransitionName = "product-img";
     });
-    // Zurueck zur Uebersicht: das Bild des zuletzt geoeffneten Produkts markieren
     window.addEventListener("pagereveal", (e) => {
       clearNames();
       const from = window.navigation?.activation?.from?.url;

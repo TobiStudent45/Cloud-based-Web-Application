@@ -22,7 +22,6 @@ if (root) {
   const interiorViews = root.querySelector("#interior-camera-views");
   const interiorViewButtons = [...interiorViews.querySelectorAll("[data-interior-view]")];
   const viewLabel = root.querySelector("#car-view-label");
-  // Presentation presets measured for this GLB, in its original meter coordinates.
   const interiorCameras = {
     lambo: {
       seats: { target: "0m 0.55m -0.15m", orbit: "-25deg 70deg 0.95m", fieldOfView: "85deg" },
@@ -93,7 +92,6 @@ if (root) {
   }
 
   function updateConfiguration() {
-    // Restore once before applying groups: paint and finish share materials.
     restoreMaterials();
     for (const group of activeGroups) {
       const choice = group.choices.find((item) => item.id === activeChoices.get(group.id));
@@ -125,7 +123,6 @@ if (root) {
     const materials = element.model.materials;
     activeGroups = options.groups.flatMap((group) => {
       const targets = group.materialNames.map((name) => materials.find((material) => material.name === name));
-      // Only offer controls whose complete material mapping is present in this GLB.
       if (!targets.length || targets.some((material) => !material) || !group.choices.length) return [];
       for (const material of targets) {
         if (originalMaterials.has(material)) continue;
@@ -213,7 +210,6 @@ if (root) {
 
   function loadViewerLibrary() {
     if (!viewerLibrary) {
-      // Served by our frontend, not a third-party script CDN.
       viewerLibrary = import("/vendor/model-viewer.min.js");
     }
     return viewerLibrary;
@@ -264,7 +260,6 @@ if (root) {
       await loadViewerLibrary();
       if (selection !== current) return;
 
-      // Fresh elements isolate late load/error events from a previous selection.
       const element = document.createElement("model-viewer");
       viewer = element;
       element.setAttribute("alt", "Interaktives 3D-Modell: " + button.dataset.carName);
@@ -318,7 +313,7 @@ if (root) {
       const response = await fetch("/api/configurator/configurations/" + encodeURIComponent(savedId), { signal: AbortSignal.timeout(10000) });
       const snapshot = await response.json();
       if (!response.ok) throw new Error(snapshot.error || "Konfiguration nicht gefunden.");
-      if (selection) return; // A user selection takes precedence over a late restore request.
+      if (selection) return;
       const button = buttons.find((item) => item.dataset.carId === snapshot.vehicle.id);
       if (!button) throw new Error("Das gespeicherte Fahrzeug ist nicht mehr verfügbar.");
       choicesByCar.set(snapshot.vehicle.id, new Map(snapshot.selections.map((item) => [item.groupId, item.choiceId])));

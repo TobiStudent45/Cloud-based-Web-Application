@@ -1,12 +1,7 @@
-// Zentrale Seiten-Registry: EINZIGE Stelle fuer Routen + Navigation.
-// Neuer Service = ein Eintrag hier + eine View unter views/pages/<view>.ejs.
-// label    -> Text im Navigationsmenue
-// path     -> URL-Pfad (Express-Route)
-// view     -> Dateiname (ohne .ejs) unter views/pages/
-// api      -> optional: Gateway-Pfad, den der Fetch-Helfer serverseitig abruft
-//             (Ergebnis steht in der View als `data` bereit)
-// nav      -> optional: false = nicht im Hauptmenue (z. B. Warenkorb oben rechts)
-// detail   -> optional: Detailseite unter <path>/:id, `:id` im api-Pfad wird ersetzt
+// Page registry: single source for routes and navigation, consumed by server.js.
+// Fields: label, path, view (views/pages/<view>.ejs), api (gateway path fetched before
+// rendering and exposed as `data`), nav (false hides the entry), detail ({ view, api } for <path>/:id).
+
 
 module.exports = [
   { label: "Home",          path: "/",              view: "home" },

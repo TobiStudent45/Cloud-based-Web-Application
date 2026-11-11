@@ -1,5 +1,5 @@
-// Microservice: merchandise
-// GET /products, GET /products/:id, GET /images/:key
+// merchandise microservice: GET /products, GET /products/:id, GET /images/:key.
+// Seeds the bucket from seed-images on startup.
 
 const express = require("express");
 const fs = require("fs");
@@ -110,7 +110,6 @@ app.get("/images/:key", async (req, res) => {
   }
 });
 
-// Beim Start fehlende Bilder aus seed-images in den Bucket hochladen
 const SEED_DIR = path.join(__dirname, "seed-images");
 const CONTENT_TYPES = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" };
 

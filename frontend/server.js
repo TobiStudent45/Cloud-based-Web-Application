@@ -1,8 +1,5 @@
-// Frontend (Presentation Tier) – Port 80.
-// Routen werden datengetrieben aus config/pages.js erzeugt: eine Schleife
-// fuer alle Seiten, kein wiederholter Boilerplate pro Seite. Jede Seite erbt
-// automatisch Layout + Navigation. Hat eine Seite ein `api`-Feld, holt der
-// Server die Daten vom Gateway und uebergibt sie als `data` an die View.
+// Frontend server (presentation tier): renders the EJS views for the routes in config/pages.js
+// and proxies /api/* to the gateway. It never talks to a service directly.
 
 const express = require("express");
 const layouts = require("express-ejs-layouts");
@@ -19,19 +16,16 @@ app.set("views", path.join(__dirname, "views"));
 app.use(layouts);
 app.set("layout", "layouts/mainLayout");
 app.use(express.static(path.join(__dirname, "public")));
-// Expose only the bundled viewer, not the entire node_modules directory.
 app.get("/vendor/model-viewer.min.js", (req, res) => {
   res.sendFile(path.join(__dirname, "node_modules/@google/model-viewer/dist/model-viewer.min.js"));
 });
 
-// Navigation steht in allen Views zur Verfuegung (res.locals)
 app.use((req, res, next) => {
   res.locals.nav = pages.filter((p) => p.nav !== false);
   res.locals.currentPath = req.path;
   next();
 });
 
-// /api/... an das Gateway weiterleiten (z. B. Produktbilder)
 app.all("/api/*", async (req, res) => {
   try {
     const isModel = /^\/api\/configurator\/cars\/[^/]+\/model$/.test(req.path);
@@ -60,7 +54,6 @@ app.all("/api/*", async (req, res) => {
   }
 });
 
-// Eine Route pro Config-Eintrag
 for (const page of pages) {
   app.get(page.path, async (req, res) => {
     let data = null;

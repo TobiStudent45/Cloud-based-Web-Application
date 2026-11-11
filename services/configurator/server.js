@@ -1,3 +1,6 @@
+// configurator microservice. The schema is re-applied on every startup because DB init scripts
+// only run for a fresh volume. Catalog file names are validated so they cannot leave the model directory.
+
 const express = require("express");
 const path = require("path");
 const fs = require("fs/promises");
@@ -52,7 +55,6 @@ async function findConfiguration(id) {
 }
 
 function modelPath(car) {
-  // Catalog filenames must never escape the model directory.
   if (!/^[a-zA-Z0-9_-]+\.glb$/.test(car.model_file)) {
     throw new Error("Invalid catalog model filename");
   }
@@ -188,12 +190,10 @@ app.use((err, req, res, next) => {
 });
 
 async function start() {
-  // init.sql only runs for a new DB volume. Apply our schema for existing volumes too.
   const schemaPath = process.env.CATALOG_SCHEMA_PATH || path.join(__dirname, "../../db/mysql/configurator.sql");
   for (const file of [schemaPath, ...["configurator-options.sql", "configurator-pricing.sql", "configurator-configurations.sql"].map((name) => path.join(path.dirname(schemaPath), name))]) {
     await db.query(await fs.readFile(file, "utf8"));
   }
-  // Extend already initialized volumes without changing existing option data.
   const [sectionColumn] = await db.query("SHOW COLUMNS FROM configurator_option_groups LIKE 'section'");
   if (!sectionColumn.length) {
     await db.query("ALTER TABLE configurator_option_groups ADD COLUMN section VARCHAR(16) NOT NULL DEFAULT 'exterior'");
@@ -208,10 +208,8 @@ async function start() {
       "beetle", "Beetle", "Ein Klassiker, ganz nach deinem Stil.", "Beetle-web.glb", 2,
     ]
   );
-  // Replace only the untouched second-car placeholder, keeping custom catalog data.
   await db.execute("DELETE FROM configurator_cars WHERE id = ? AND name = ? AND model_file = ?",
     ["model-2", "Fahrzeug 2", "model-2.glb"]);
-  // Explicitly retired option: also remove it from already initialized databases.
   await db.execute("DELETE FROM configurator_option_groups WHERE id = ?", ["interior-stitching"]);
   for (const [carId, groups] of Object.entries(optionGroups)) {
     await db.execute("UPDATE configurator_cars SET base_price_cents = ? WHERE id = ? AND base_price_cents IS NULL", [priceCatalog[carId].basePriceCents, carId]);

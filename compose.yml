@@ -1,6 +1,8 @@
+# Tiers: frontend (presentation), backend (API gateway), services (business logic), mysql/redis/minio (data).
+# Only the frontend and the admin UIs publish ports; all other services are reachable inside app-net only.
+
 services:
 
-  # Presentation Tier
   frontend:
     build: ./frontend
     ports:
@@ -12,7 +14,6 @@ services:
         condition: service_started
     networks: [app-net]
 
-  # API Gateway
   backend:
     build: ./backend
     depends_on:
@@ -34,7 +35,6 @@ services:
         condition: service_started
     networks: [app-net]
 
-  # Business Logic Tier
   configurator:
     build: ./services/configurator
     environment:
@@ -85,7 +85,6 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: merchandise
     volumes:
-      # Startbilder, werden beim Start in den Bucket hochgeladen
       - ./db/minio/merchandise:/app/seed-images:ro
     depends_on:
       mysql:
@@ -125,7 +124,6 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       MINIO_BUCKET: impressions
     volumes:
-      # Startbilder, werden beim Start in den Bucket hochgeladen
       - ./db/minio/impressions:/app/seed-images:ro
     depends_on:
       minio:
@@ -142,7 +140,6 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     networks: [app-net]
 
-  # Data Tier
   mysql:
     image: mysql:8
     environment:
