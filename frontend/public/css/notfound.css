@@ -3,7 +3,6 @@
 .nf::before { content: ""; position: absolute; z-index: -1; left: 50%; top: 45%; width: min(520px, 90vw); height: 360px; transform: translate(-50%, -50%); background: radial-gradient(ellipse at center, rgba(91, 91, 240, 0.14), rgba(34, 211, 238, 0.06) 55%, transparent 72%); animation: nf-glow 10s ease-in-out infinite alternate; }
 .nf-body { max-width: 440px; }
 .nf-figure { display: block; margin: 0 auto 4px; overflow: visible; }
-.nf-code { margin: 0; font-size: clamp(56px, 10vw, 84px); font-weight: 600; line-height: 1; letter-spacing: -0.06em; background: linear-gradient(180deg, #0a0a0a 30%, #a1a1aa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .nf h1 { margin: 6px 0 8px; font-size: clamp(1.25rem, 3vw, 1.6rem); letter-spacing: -0.03em; }
 .nf-text { margin: 0 auto 22px; max-width: 40ch; color: var(--text-muted); font-size: 0.9375rem; }
 .nf-head { transform-origin: 120px 132px; animation: nf-tilt 4.5s ease-in-out infinite alternate; }
