@@ -1,8 +1,4 @@
-/* ───────────────────────────────────────────────────────────
-   Zentrales Design-System. Einzige Quelle fuer Farben, Abstaende,
-   Cards, Buttons, Navigation. Service-Seiten nutzen diese Klassen,
-   damit das Styling nicht an mehreren Orten gepflegt werden muss.
-   ─────────────────────────────────────────────────────────── */
+/* Global design system: colors, spacing, header, cards and buttons shared by all pages. */
 
 :root {
   --bg: #0f1115;
@@ -33,10 +29,8 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); }
 
-/* Layout-Rahmen */
 .page { max-width: var(--maxw); margin: 0 auto; padding: 24px; }
 
-/* Kopfzeile + Navigation */
 .site-header {
   position: sticky;
   top: 0;
@@ -64,7 +58,6 @@ a:hover { color: var(--accent-hover); }
 .main-nav a:hover { color: var(--text); background: var(--surface-2); }
 .main-nav a.active { color: var(--accent-text); background: var(--accent); }
 
-/* Warenkorb-Symbol oben rechts */
 .cart-link {
   margin-left: auto;
   display: flex;
@@ -76,7 +69,6 @@ a:hover { color: var(--accent-hover); }
 .cart-link:hover { color: var(--text); background: var(--surface-2); }
 .cart-link.active { color: var(--accent-text); background: var(--accent); }
 
-/* Bausteine */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -105,7 +97,6 @@ a:hover { color: var(--accent-hover); }
 h1 { font-size: 1.8rem; margin: 0 0 8px; }
 h2 { font-size: 1.3rem; margin: 0 0 8px; }
 
-/* Produktkarten: 4 x 2 Raster, passt ohne Scrollen auf den Bildschirm */
 .product-grid { grid-template-columns: repeat(4, 1fr); }
 .product-card { padding: 0; overflow: hidden; }
 .product-card img {
@@ -122,7 +113,6 @@ a.product-card { display: block; color: var(--text); transition: border-color 0.
 a.product-card:hover { border-color: var(--accent); color: var(--text); transform: translateY(-3px); }
 a.product-card:hover img { transform: scale(1.05); }
 
-/* Produkt-Detailseite */
 .back-link { display: inline-block; margin-bottom: 12px; color: var(--text-muted); }
 .product-detail {
   display: grid;
@@ -167,7 +157,6 @@ a.product-card:hover img { transform: scale(1.05); }
 .add-to-cart .btn { height: 44px; }
 .btn:disabled { background: var(--surface-2); color: var(--text-muted); cursor: not-allowed; }
 
-/* Impressionen: Button ueber dem Video, Video im 16:9-Format */
 html { scroll-behavior: smooth; }
 .impressions-video {
   position: relative;
@@ -199,7 +188,6 @@ html { scroll-behavior: smooth; }
 img.impression-img { display: block; width: 100%; object-fit: cover; border-bottom: 0; }
 .impressions-grid img.impression-img { cursor: zoom-in; }
 
-/* Grossansicht: Hintergrund unscharf, Bild im 4:3-Ausschnitt */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -245,11 +233,9 @@ img.impression-img { display: block; width: 100%; object-fit: cover; border-bott
   .product-detail img { width: 100%; height: auto; }
 }
 
-/* Seitenuebergang Uebersicht <-> Detail (View Transitions API) */
 @view-transition { navigation: auto; }
 .site-header { view-transition-name: site-header; }
 
-/* Bild fliegt weich an die neue Position und waechst dabei */
 ::view-transition-group(product-img) {
   animation-duration: 0.9s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
@@ -263,11 +249,9 @@ img.impression-img { display: block; width: 100%; object-fit: cover; border-bott
   animation-duration: 0.9s;
 }
 
-/* Restliche Seite: alte tritt zurueck, neue blendet ein */
 ::view-transition-old(root) { animation: vt-out 0.3s ease-in both; }
 ::view-transition-new(root) { animation: vt-in 0.45s 0.1s ease-out both; }
 
-/* Produkttext gleitet nach dem Bild von rechts herein */
 ::view-transition-old(product-info) { animation: vt-out 0.2s ease-in both; }
 ::view-transition-new(product-info) { animation: vt-slide 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
@@ -281,7 +265,6 @@ img.impression-img { display: block; width: 100%; object-fit: cover; border-bott
   ::view-transition-new(*) { animation: none !important; }
 }
 
-/* Hinweis-/Platzhalterbox fuer Service-Stubs */
 .stub-note {
   border: 1px dashed var(--border);
   border-radius: var(--radius);
