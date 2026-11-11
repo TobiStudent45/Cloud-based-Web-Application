@@ -86,4 +86,8 @@ for (const page of pages) {
   }
 }
 
+app.use((req, res) => {
+  res.status(404).render("pages/404", { title: "Seite nicht gefunden", data: null, apiError: null });
+});
+
 app.listen(PORT, () => console.log(`[frontend] Web-UI laeuft auf Port ${PORT}`));
