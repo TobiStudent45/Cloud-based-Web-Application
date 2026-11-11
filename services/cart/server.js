@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 async function readCart(key) {
   const raw = await redis.hgetall(key);
   const items = Object.values(raw).map((s) => JSON.parse(s));
-  const count = items.reduce((n, i) => n + i.quantity, 0);
+  const count = items.length;
   const totalCents = items.reduce((n, i) => n + i.unitPriceCents * i.quantity, 0);
   return { items, count, totalCents };
 }

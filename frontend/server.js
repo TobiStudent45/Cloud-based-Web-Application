@@ -83,7 +83,7 @@ for (const page of pages) {
       const result = await fetchFromGateway(page.detail.api.replace(":id", encodeURIComponent(req.params.id)));
       if (!result.ok && ["Status 400", "Status 404"].includes(result.error)) {
         return res.status(404).render(`pages/${page.detail.view}`, {
-          title: page.label, data: null, apiError: "Nicht gefunden", backPath: page.path,
+          title: page.label, data: null, apiError: "Nicht gefunden", backPath: page.path, fromCart: req.query.from === "cart",
         });
       }
       res.render(`pages/${page.detail.view}`, {
@@ -91,6 +91,8 @@ for (const page of pages) {
         data: result.data,
         apiError: result.ok ? null : result.error,
         backPath: page.path,
+        fromCart: req.query.from === "cart",
+        selectedSize: String(req.query.size || ""),
       });
     });
   }

@@ -28,9 +28,11 @@
     document.getElementById("cart-total").textContent = eur(cart.totalCents);
     document.getElementById("cart-items").innerHTML = cart.items.map((i) => `
       <article class="card cart-item">
-        ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="">` : `<div class="cart-thumb"></div>`}
+        <a href="/merchandise/${i.productId}?from=cart${i.size ? "&size=" + encodeURIComponent(i.size) : ""}" aria-label="${esc(i.title)} ansehen">
+          ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="">` : `<div class="cart-thumb"></div>`}
+        </a>
         <div>
-          <h3>${esc(i.title)}</h3>
+          <h3><a class="cart-title" href="/merchandise/${i.productId}?from=cart${i.size ? "&size=" + encodeURIComponent(i.size) : ""}">${esc(i.title)}</a></h3>
           ${i.size ? `<div class="muted">Größe: ${esc(i.size)}</div>` : ""}
           <div class="cart-qty">
             <button type="button" data-act="dec" data-key="${esc(i.key)}" data-q="${i.quantity}" aria-label="Weniger">−</button>

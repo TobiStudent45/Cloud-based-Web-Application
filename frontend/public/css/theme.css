@@ -165,6 +165,13 @@ a.product-card:hover img { transform: scale(1.05); }
 
 .back-link { display: inline-block; margin-bottom: 12px; color: var(--text-muted); }
 .back-link:hover { color: var(--text); }
+.close-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; margin-bottom: 12px;
+  border: 1px solid var(--border); border-radius: 50%; background: #fff;
+  color: var(--text-muted); font-size: 1rem; line-height: 1;
+}
+.close-link:hover { color: var(--text); border-color: var(--text-muted); }
 .product-detail {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -208,6 +215,8 @@ a.product-card:hover img { transform: scale(1.05); }
 .add-to-cart select:focus-visible,
 .add-to-cart input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
 .add-to-cart .btn { height: 44px; }
+.btn-outline { background: #fff; color: var(--text); border: 1px solid var(--border); box-shadow: none; margin-top: 12px; height: 44px; }
+.btn-outline:hover { background: var(--surface-2); color: var(--text); border-color: var(--text-muted); }
 .btn:disabled { background: var(--surface-2); border-color: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
 
 .impressions-video {

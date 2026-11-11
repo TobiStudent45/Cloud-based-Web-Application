@@ -20,3 +20,6 @@
 .form-error { color: #b91c1c; margin: 0; }
 .order-box { padding: 20px; margin: var(--gap) 0; display: grid; gap: 8px; }
 .order-box .row { display: flex; justify-content: space-between; gap: 12px; }
+.cart-item > a { display: block; line-height: 0; }
+.cart-title { color: inherit; text-decoration: none; }
+.cart-title:hover { text-decoration: underline; }

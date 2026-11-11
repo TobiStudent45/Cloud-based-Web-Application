@@ -3,7 +3,9 @@
   const formatPrice = (p) =>
     new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(p);
 %>
-<% if (isDetail) { %>
+<% if (isDetail && locals.fromCart) { %>
+  <a href="/shoppingcart" class="close-link" aria-label="Schließen" title="Schließen">✕</a>
+<% } else if (isDetail) { %>
   <a href="<%= backPath %>" class="back-link">← Weitere Artikel</a>
 <% } %>
 
@@ -52,7 +54,7 @@
           <label>Größe
             <select name="size" required>
               <% data.sizes.forEach(function (s) { %>
-                <option value="<%= s %>"><%= s %></option>
+                <option value="<%= s %>" <%= locals.selectedSize === s ? "selected" : "" %>><%= s %></option>
               <% }); %>
             </select>
           </label>
@@ -71,6 +73,9 @@
           <%= data.in_stock ? "In den Warenkorb" : "Ausverkauft" %>
         </button>
       </form>
+      <% if (locals.fromCart) { %>
+        <button type="button" class="btn btn-outline" id="remove-from-cart">Entfernen</button>
+      <% } %>
       <script>
         const cartForm = document.querySelector("form.add-to-cart");
         cartForm.addEventListener("submit", async (e) => {
@@ -97,6 +102,23 @@
           }
           setTimeout(() => (btn.textContent = "In den Warenkorb"), 1800);
         });
+        const removeBtn = document.getElementById("remove-from-cart");
+        if (removeBtn) {
+          removeBtn.addEventListener("click", async () => {
+            const size = new FormData(cartForm).get("size") || "-";
+            const productId = cartForm.querySelector("[name=productId]").value;
+            removeBtn.disabled = true;
+            try {
+              const res = await fetch("/api/cart/items/" + encodeURIComponent(`merch:${productId}:${size}`), { method: "DELETE" });
+              if (!res.ok) throw new Error();
+              document.dispatchEvent(new CustomEvent("cart:changed", { detail: await res.json() }));
+              location.href = "/shoppingcart";
+            } catch (err) {
+              removeBtn.disabled = false;
+              removeBtn.textContent = "Fehler, bitte erneut versuchen";
+            }
+          });
+        }
         document.querySelector(".qty-select").addEventListener("change", (e) => {
           if (e.target.value !== "more") return;
           const input = e.target.nextElementSibling;
