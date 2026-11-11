@@ -10,6 +10,7 @@ const { fetchFromGateway, GATEWAY_URL } = require("./lib/gateway");
 
 const app = express();
 const PORT = process.env.PORT || 80;
+const PRODUCT_PICTURES_URL = (process.env.PRODUCT_PICTURES_URL || "http://localhost:9000/product-pictures").replace(/\/$/, "");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -23,6 +24,7 @@ app.get("/vendor/model-viewer.min.js", (req, res) => {
 app.use((req, res, next) => {
   res.locals.nav = pages.filter((p) => p.nav !== false);
   res.locals.currentPath = req.path;
+  res.locals.productPicturesUrl = PRODUCT_PICTURES_URL;
   next();
 });
 

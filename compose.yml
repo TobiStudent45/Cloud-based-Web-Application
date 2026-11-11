@@ -1,5 +1,6 @@
 # Tiers: frontend (presentation), backend (API gateway), services (business logic), mysql/redis/minio (data).
-# Only the frontend and the admin UIs publish ports; all other services are reachable inside app-net only.
+# Only the frontend, the admin UIs and MinIO publish ports; all other services are reachable inside app-net only.
+# The browser loads product pictures directly from the public MinIO bucket product-pictures (seeded by minio-init), not through the gateway.
 
 services:
 
@@ -9,6 +10,7 @@ services:
       - "80:80"
     environment:
       GATEWAY_URL: http://backend:3000
+      PRODUCT_PICTURES_URL: ${PRODUCT_PICTURES_URL:-http://localhost:9000/product-pictures}
     depends_on:
       backend:
         condition: service_started
@@ -200,6 +202,27 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes: [minio-data:/data]
+    networks: [app-net]
+
+  minio-init:
+    image: cgr.dev/chainguard/minio-client:latest-dev
+    environment:
+      MC_CONFIG_DIR: /tmp/.mc
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./db/minio/product-pictures:/seed:ro
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do sleep 1; done;
+        mc mb --ignore-existing local/product-pictures &&
+        mc anonymous set download local/product-pictures &&
+        mc mirror --overwrite --exclude "*.md" /seed local/product-pictures
+    restart: "no"
     networks: [app-net]
 
 volumes:
