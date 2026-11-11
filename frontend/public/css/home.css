@@ -77,7 +77,7 @@
   .home .bento{grid-template-columns:1fr}
   .home .span2{grid-column:auto}
   .home .cfg{grid-template-columns:1fr}
-  .home .s-l,.home .s-r,.home .b1,.home .b2{display:none}
+  .home .s-l,.home .s-r,.home .hbadge{display:none}
   .home .hero{padding-top:56px}
   .home .sec{padding-top:80px}
 }
@@ -144,3 +144,11 @@
   .home .tl li{padding:0 0 32px 40px}
   .home .tl li::before{top:6px}
 }
+.home .b3{left:6%;top:2%}
+.home .b4{right:5%;bottom:6%}
+.home .b5{left:46%;bottom:1%}
+.home .b6{left:2%;top:60%}
+.home .b7{right:4%;top:2%}
+.js-home .home .hbadge{opacity:0;transform:translateY(22px) scale(.6);transition:opacity .45s ease,transform .7s cubic-bezier(.34,1.56,.64,1);transition-delay:var(--bd,0s)}
+.js-home .home .stage.show .hbadge{opacity:1;transform:none;animation:home-bob 5s ease-in-out infinite alternate;animation-delay:calc(var(--bd,0s) + .8s)}
+@keyframes home-bob{from{translate:0 0}to{translate:0 -9px}}
