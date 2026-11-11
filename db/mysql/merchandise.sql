@@ -1,7 +1,6 @@
--- Merchandise-Service: eigene Datenbank (Database per Service)
--- Läuft automatisch beim ersten Start mit leerem MySQL-Volume.
-
--- Datei ist UTF-8: sonst liest der mysql-Client sie als latin1 und Umlaute gehen kaputt
+-- Merchandise service: own database. Runs on first start with an empty MySQL volume.
+-- File must stay UTF-8, otherwise the mysql client reads it as latin1 and breaks umlauts.
+-- Image credits: db/minio/merchandise/QUELLEN.md
 SET NAMES utf8mb4;
 
 CREATE DATABASE IF NOT EXISTS merchandise CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -29,7 +28,6 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 INSERT INTO products (sku, name, short_description, description, category, price, stock, color, sizes, image_key, is_featured) VALUES
-  -- Bilder: Unsplash (Dateiname = Fotograf + Unsplash-ID), Bucket "merchandise"
   ('AD-CAP-001', 'Racing Cap',
    'Baseball-Cap im Washed-Look mit gesticktem Logo.',
    'Six-Panel-Cap aus stonewashed Baumwolle mit Ton-in-Ton-Stickerei des Aetheria-Dynamics-Logos auf der Front. Vorgebogener Schirm, verstellbarer Riemen, Einheitsgröße.',
