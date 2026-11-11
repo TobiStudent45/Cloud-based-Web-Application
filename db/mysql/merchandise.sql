@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS products (
 INSERT INTO products (sku, name, short_description, description, category, price, stock, color, sizes, image_key, is_featured) VALUES
   ('AD-CAP-001', 'Racing Cap',
    'Baseball-Cap im Washed-Look mit gesticktem Logo.',
-   'Six-Panel-Cap aus stonewashed Baumwolle mit Ton-in-Ton-Stickerei des Aetheria-Dynamics-Logos auf der Front. Vorgebogener Schirm, verstellbarer Riemen, Einheitsgröße.',
+   'Six-Panel-Cap aus stonewashed Baumwolle mit Ton-in-Ton-Stickerei des Aureo-Logos auf der Front. Vorgebogener Schirm, verstellbarer Riemen, Einheitsgröße.',
    'Bekleidung', 29.90, 50, 'Grau', NULL, 'yang-deng-2loKxdi6Hmo-unsplash.jpg', TRUE),
 
   ('AD-TSH-001', 'Tshirt Leisure',
