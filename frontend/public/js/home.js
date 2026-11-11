@@ -35,15 +35,29 @@
   var steps = tl ? tl.querySelectorAll('li') : [];
   var ticking = false;
 
+  var tlCur = 0, tlTarget = 0, tlRaf = 0;
+
+  function paintTimeline() {
+    tl.style.setProperty('--tp', tlCur);
+    steps.forEach(function (li, i) {
+      li.style.setProperty('--i', (i * 0.35) + 's');
+      li.classList.toggle('on', tlCur >= (i / steps.length) * 0.95 + 0.01);
+    });
+  }
+
+  function tlTick() {
+    tlCur += (tlTarget - tlCur) * 0.07;
+    if (Math.abs(tlTarget - tlCur) < 0.0005) tlCur = tlTarget;
+    paintTimeline();
+    tlRaf = tlCur === tlTarget ? 0 : requestAnimationFrame(tlTick);
+  }
+
   function updateTimeline() {
     if (!tl) return;
-    var p = 1;
-    if (!reduce) {
-      var r = tl.getBoundingClientRect();
-      p = Math.min(1, Math.max(0, (window.innerHeight * 0.85 - r.top) / (r.height + window.innerHeight * 0.2)));
-    }
-    tl.style.setProperty('--tp', p);
-    steps.forEach(function (li, i) { li.classList.toggle('on', p >= (i / steps.length) * 0.95 + 0.01); });
+    if (reduce) { tlCur = tlTarget = 1; paintTimeline(); return; }
+    var r = tl.getBoundingClientRect();
+    tlTarget = Math.min(1, Math.max(0, (window.innerHeight * 0.85 - r.top) / (r.height + window.innerHeight * 0.2)));
+    if (!tlRaf) tlRaf = requestAnimationFrame(tlTick);
   }
 
   function update() {
