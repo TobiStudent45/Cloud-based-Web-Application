@@ -1,5 +1,120 @@
-<section class="card">
-  <h1>Willkommen bei Aetheria Dynamics</h1>
-  <p class="muted">Cloud-native Car Manufacturer – Gruppenprojekt.</p>
-  <p>Nutze die Navigation oben, um zu den einzelnen Bereichen zu gelangen.</p>
-</section>
+<link rel="stylesheet" href="/css/home.css" />
+
+<div class="home">
+  <section class="hero" aria-labelledby="home-title">
+    <div class="hero-bg" aria-hidden="true">
+      <span class="hero-grid"></span>
+      <span class="hero-orb o1"></span>
+      <span class="hero-orb o2"></span>
+      <span class="hero-orb o3"></span>
+      <span class="hero-road"></span>
+      <span class="hero-streak s1"></span>
+      <span class="hero-streak s2"></span>
+      <span class="hero-streak s3"></span>
+      <span class="hero-streak s4"></span>
+      <span class="hero-fade"></span>
+    </div>
+    <div class="wrap">
+      <h1 id="home-title" class="rv" style="--d:.08s">Das Auto,<br><span>das du dir vorstellst.</span></h1>
+      <p class="sub rv" style="--d:.16s">Konfiguriere dein Fahrzeug in 3D, entdecke die Kollektion und erlebe Aureo.</p>
+      <div class="hbtns rv" style="--d:.24s">
+        <a class="hcta" href="/configurator">Konfigurator starten <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap stage-wrap">
+      <div class="stage" id="home-stage">
+        <figure class="s-l"><img src="/api/impressions/images/lamborghini-05.jpg" alt="V12-Motor im Motorraum" width="800" height="1000" /></figure>
+        <figure class="s-c"><img src="/api/impressions/images/lamborghini-08.jpg" alt="Roter Lamborghini Huracán von vorne" width="1000" height="1000" /></figure>
+        <figure class="s-r"><img src="/api/impressions/images/lamborghini-01.jpg" alt="Innenraum mit Sportsitzen" width="800" height="1000" /></figure>
+        <span class="hbadge b1" aria-hidden="true"><i></i>3D live konfigurierbar</span>
+        <span class="hbadge b2" aria-hidden="true">V12 · Handarbeit</span>
+      </div>
+  </div>
+
+  <section class="logos rv" aria-label="Verwendete Technologien">
+    <div class="wrap">
+      <p>GEBAUT MIT</p>
+      <ul>
+        <li>Docker</li><li>Node.js</li><li>MySQL</li><li>Redis</li><li>MinIO</li><li>Gemini</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="stats rv">
+      <div><b data-n="8">8</b><span>Microservices</span></div>
+      <div><b data-n="12">12</b><span>Impressionen</span></div>
+      <div><b data-n="2">2</b><span>3D-Modelle</span></div>
+    </div>
+  </div>
+
+  <div class="marq rv" aria-label="Fotogalerie">
+    <div class="track">
+      <% const marq = ['08', '05', '01', '03', '02', '06', '09', '11']; %>
+      <% marq.forEach(function (n) { %><img src="/api/impressions/images/lamborghini-<%= n %>.jpg" alt="Lamborghini Impression <%= n %>" width="300" height="200" loading="lazy" /><% }); %>
+      <% marq.forEach(function (n) { %><img src="/api/impressions/images/lamborghini-<%= n %>.jpg" alt="" aria-hidden="true" width="300" height="200" loading="lazy" /><% }); %>
+    </div>
+  </div>
+
+  <section class="sec" aria-labelledby="home-features">
+    <div class="wrap">
+      <h2 id="home-features" class="rv">Alles an einem Ort.</h2>
+      <p class="lead rv" style="--d:.1s">Von der ersten Idee bis zum fertigen Fahrzeug – ein durchgängiges Erlebnis.</p>
+
+      <div class="bento">
+        <a class="tile span2 beam rv" href="/configurator">
+          <div class="cfg">
+            <div>
+              <h3>Konfigurator</h3>
+              <p>Lack, Felgen und Innenraum live im 3D-Modell anpassen – inklusive Preisübersicht.</p>
+              <span class="go">Jetzt öffnen <span aria-hidden="true">→</span></span>
+            </div>
+            <img src="/api/impressions/images/lamborghini-03.jpg" alt="Lenkrad des Sportwagens" width="600" height="460" loading="lazy" />
+          </div>
+        </a>
+        <a class="tile photo rv" href="/impressions" style="--d:.08s">
+          <img src="/api/impressions/images/lamborghini-01.jpg" alt="Innenraum des Sportwagens" width="600" height="500" loading="lazy" />
+          <span class="go-chip" aria-hidden="true">→</span>
+          <div class="t"><h3>Impressionen</h3><p>Video und Galerie</p></div>
+        </a>
+
+        <a class="tile rv" href="/merchandise">
+          <h3>Merchandise</h3>
+          <p>Caps, Shirts und mehr.</p>
+          <div class="mer" aria-hidden="true"><span>Cap</span><span>Shirt</span></div>
+          <span class="go">Entdecken <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="tile span2 rv" href="/road2supercar" style="--d:.08s">
+          <h3>Road2Supercar</h3>
+          <p>Der Weg vom Entwurf zum Supercar.</p>
+          <div class="rd" aria-hidden="true">
+            <span class="n">1</span><span class="l"></span><span class="n">2</span><span class="l"></span><span class="n">3</span><span class="l"></span><span class="n f">✓</span>
+          </div>
+          <span class="go">Entdecken <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="tile rv" href="/ai" style="--d:.16s">
+          <h3>AI Feature</h3>
+          <p>Kreativ mit Gemini.</p>
+          <div class="ai" aria-hidden="true"><em>Ein Supercar bei Sonnenuntergang</em><b>↑</b></div>
+          <span class="go">Ausprobieren <span aria-hidden="true">→</span></span>
+        </a>
+        <a class="tile photo span2 rv" href="/impressions" style="--d:.08s">
+          <img src="/api/impressions/images/lamborghini-05.jpg" alt="V12-Motor in Handarbeit gefertigt" width="1000" height="500" loading="lazy" />
+          <span class="go-chip" aria-hidden="true">→</span>
+          <div class="t"><h3>V12 – Handarbeit</h3><p>Technik, die man sehen darf.</p></div>
+        </a>
+      </div>
+
+      <div class="cta rv">
+        <img src="/api/impressions/images/lamborghini-08.jpg" alt="" aria-hidden="true" width="1000" height="600" loading="lazy" />
+        <h2>Bereit für deine Konfiguration?</h2>
+        <p class="lead">Starte den Konfigurator und gestalte dein Fahrzeug.</p>
+        <a class="hbtn light" href="/configurator">Konfigurator starten <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="/js/home.js" defer></script>

@@ -1,4 +1,4 @@
-<section class="card">
+<section class="card page-head">
   <h1>Warenkorb</h1>
   <p class="muted">Deine ausgewählten Artikel und Konfigurationen.</p>
 </section>
@@ -6,7 +6,7 @@
 <% if (apiError) { %>
   <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
 <% } else if (data) { %>
-  <pre class="stub-note" style="overflow:auto"><%= JSON.stringify(data, null, 2) %></pre>
+  <pre class="stub-note"><%= JSON.stringify(data, null, 2) %></pre>
 <% } else { %>
   <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
 <% } %>
