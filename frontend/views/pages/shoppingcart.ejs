@@ -1,12 +1,71 @@
+<link rel="stylesheet" href="/css/cart.css" />
+
 <section class="card page-head">
   <h1>Warenkorb</h1>
-  <p class="muted">Deine ausgewählten Artikel und Konfigurationen.</p>
+  <p class="muted">Deine ausgewählten Artikel.</p>
 </section>
 
-<% if (apiError) { %>
-  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
-<% } else if (data) { %>
-  <pre class="stub-note"><%= JSON.stringify(data, null, 2) %></pre>
-<% } else { %>
-  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
-<% } %>
+<div id="cart-empty" class="card cart-empty" hidden>
+  <p class="muted">Dein Warenkorb ist leer.</p>
+  <a class="btn" href="/merchandise">Zum Merchandise</a>
+</div>
+
+<div class="cart-layout" id="cart-content" hidden>
+  <div class="cart-list" id="cart-items"></div>
+  <aside class="card cart-summary">
+    <div class="row total"><span>Gesamt</span><span id="cart-total"></span></div>
+    <a class="btn" href="/checkout">Zur Kasse</a>
+  </aside>
+</div>
+
+<script>
+  const eur = (c) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  function render(cart) {
+    document.getElementById("cart-empty").hidden = cart.items.length > 0;
+    document.getElementById("cart-content").hidden = cart.items.length === 0;
+    document.getElementById("cart-total").textContent = eur(cart.totalCents);
+    document.getElementById("cart-items").innerHTML = cart.items.map((i) => `
+      <article class="card cart-item">
+        ${i.imageUrl ? `<img src="${esc(i.imageUrl)}" alt="">` : `<div class="cart-thumb"></div>`}
+        <div>
+          <h3>${esc(i.title)}</h3>
+          ${i.size ? `<div class="muted">Größe: ${esc(i.size)}</div>` : ""}
+          <div class="cart-qty">
+            <button type="button" data-act="dec" data-key="${esc(i.key)}" data-q="${i.quantity}" aria-label="Weniger">−</button>
+            <span>${i.quantity}</span>
+            <button type="button" data-act="inc" data-key="${esc(i.key)}" data-q="${i.quantity}" aria-label="Mehr" ${i.quantity >= (i.maxQuantity || 99) ? "disabled" : ""}>+</button>
+          </div>
+          <button type="button" class="cart-remove" data-act="del" data-key="${esc(i.key)}">Entfernen</button>
+        </div>
+        <div class="price">${eur(i.unitPriceCents * i.quantity)}</div>
+      </article>`).join("");
+  }
+
+  async function call(method, path, body) {
+    const res = await fetch("/api/cart" + path, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: body && JSON.stringify(body),
+    });
+    const cart = await res.json();
+    if (!res.ok) return;
+    render(cart);
+    document.dispatchEvent(new CustomEvent("cart:changed", { detail: cart }));
+  }
+
+  document.getElementById("cart-items").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-act]");
+    if (!b) return;
+    const key = encodeURIComponent(b.dataset.key);
+    const q = Number(b.dataset.q);
+    if (b.dataset.act === "del") call("DELETE", `/items/${key}`);
+    if (b.dataset.act === "inc") call("PATCH", `/items/${key}`, { quantity: q + 1 });
+    if (b.dataset.act === "dec") q > 1 ? call("PATCH", `/items/${key}`, { quantity: q - 1 }) : call("DELETE", `/items/${key}`);
+  });
+
+  fetch("/api/cart").then((r) => r.json()).then(render).catch(() => {
+    document.getElementById("cart-empty").hidden = false;
+  });
+</script>

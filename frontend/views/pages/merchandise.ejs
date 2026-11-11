@@ -46,7 +46,6 @@
         </dl>
       <% } %>
 
-      <%# TODO Warenkorb: Formular an den Cart-Service anbinden (productId, size, quantity) %>
       <form class="add-to-cart" onsubmit="return false">
         <input type="hidden" name="productId" value="<%= data.id %>" />
         <% if (data.sizes && data.sizes.length) { %>
@@ -73,6 +72,31 @@
         </button>
       </form>
       <script>
+        const cartForm = document.querySelector("form.add-to-cart");
+        cartForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = cartForm.querySelector("button[type=submit]");
+          const fd = new FormData(cartForm);
+          try {
+            const res = await fetch("/api/cart/items", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                type: "merch",
+                productId: Number(fd.get("productId")),
+                size: fd.get("size") || null,
+                quantity: Number(fd.get("quantity")) || 1,
+              }),
+            });
+            const cart = await res.json();
+            if (!res.ok) throw new Error(cart.error);
+            btn.textContent = "Hinzugefügt ✓";
+            document.dispatchEvent(new CustomEvent("cart:changed", { detail: cart }));
+          } catch (err) {
+            btn.textContent = err.message || "Fehler";
+          }
+          setTimeout(() => (btn.textContent = "In den Warenkorb"), 1800);
+        });
         document.querySelector(".qty-select").addEventListener("change", (e) => {
           if (e.target.value !== "more") return;
           const input = e.target.nextElementSibling;

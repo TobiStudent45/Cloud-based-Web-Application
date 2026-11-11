@@ -53,6 +53,7 @@
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
         </svg>
         <span>Warenkorb</span>
+        <span class="cart-badge" id="cart-badge" hidden>0</span>
       </a>
     </div>
   </header>
@@ -66,5 +67,17 @@
       <span class="foot-brand"><img src="/img/aureo-mark.svg" alt="" width="26" height="26" />Aureo</span>
     </div>
   </footer>
+  <script>
+    async function refreshCartBadge(count) {
+      if (count === undefined) {
+        try { count = (await (await fetch("/api/cart/count")).json()).count; } catch { return; }
+      }
+      const badge = document.getElementById("cart-badge");
+      badge.textContent = count;
+      badge.hidden = !count;
+    }
+    document.addEventListener("cart:changed", (e) => refreshCartBadge(e.detail && e.detail.count));
+    refreshCartBadge();
+  </script>
 </body>
 </html>

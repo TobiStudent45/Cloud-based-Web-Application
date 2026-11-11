@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="/css/cart.css" />
+
+<section class="card page-head">
+  <h1>Kasse</h1>
+  <p class="muted">Fiktiver Shop für ein Projekt: Es wird nichts bezahlt.</p>
+</section>
+
+<div class="cart-layout">
+  <form id="checkout" class="card checkout-form">
+    <label>Name *<input name="name" required autocomplete="name"></label>
+    <label>Straße und Hausnummer *<input name="street" required autocomplete="street-address"></label>
+    <label>PLZ *<input name="postalCode" required autocomplete="postal-code"></label>
+    <label>Stadt *<input name="city" required autocomplete="address-level2"></label>
+    <label>Land *<input name="country" value="Deutschland" required autocomplete="country-name"></label>
+    <label>E-Mail *<input name="email" type="email" required autocomplete="email"></label>
+    <label>Telefon (optional)<input name="phone" type="tel" autocomplete="tel"></label>
+    <p id="err" class="form-error" hidden></p>
+    <button class="btn" type="submit">Kaufen</button>
+  </form>
+  <aside class="card cart-summary">
+    <h3>Deine Bestellung</h3>
+    <div id="lines" style="display:grid;gap:8px"></div>
+    <div class="row total"><span>Gesamt</span><span id="total"></span></div>
+  </aside>
+</div>
+
+<script>
+  const eur = (c) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
+  fetch("/api/cart").then((r) => r.json()).then((cart) => {
+    if (!cart.items.length) { location.href = "/shoppingcart"; return; }
+    const lines = document.getElementById("lines");
+    for (const i of cart.items) {
+      const row = document.createElement("div");
+      row.className = "row";
+      const name = document.createElement("span");
+      name.textContent = `${i.quantity}× ${i.title}`;
+      const price = document.createElement("span");
+      price.textContent = eur(i.unitPriceCents * i.quantity);
+      row.append(name, price);
+      lines.append(row);
+    }
+    document.getElementById("total").textContent = eur(cart.totalCents);
+  });
+
+  document.getElementById("checkout").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector("button[type=submit]");
+    const err = document.getElementById("err");
+    btn.disabled = true;
+    err.hidden = true;
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(e.target))),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Bestellung fehlgeschlagen");
+      location.href = "/order?id=" + encodeURIComponent(data.orderId);
+    } catch (error) {
+      err.textContent = error.message;
+      err.hidden = false;
+      btn.disabled = false;
+    }
+  });
+</script>

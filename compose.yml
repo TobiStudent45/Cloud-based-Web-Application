@@ -98,9 +98,12 @@ services:
   cart:
     build: ./services/cart
     environment:
+      MERCHANDISE_URL: http://merchandise:3000
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
+      merchandise:
+        condition: service_started
       redis:
         condition: service_healthy
     networks: [app-net]
@@ -108,6 +111,7 @@ services:
   orders:
     build: ./services/orders
     environment:
+      CART_URL: http://cart:3000
       MYSQL_HOST: mysql
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}

@@ -11,5 +11,7 @@ module.exports = [
   { label: "Impressionen",  path: "/impressions",   view: "impressions",   api: "/impressions/images" },
   { label: "Road2Supercar", path: "/road2supercar", view: "road2supercar", api: "/road2supercar" },
   { label: "AI Feature",    path: "/ai",            view: "ai",            api: "/ai" },
-  { label: "Warenkorb",     path: "/shoppingcart",  view: "shoppingcart",  api: "/cart",  nav: false },
+  { label: "Warenkorb",     path: "/shoppingcart",  view: "shoppingcart",  nav: false },
+  { label: "Kasse",         path: "/checkout",      view: "checkout",      nav: false },
+  { label: "Bestellung",    path: "/order",         view: "order",         nav: false },
 ];

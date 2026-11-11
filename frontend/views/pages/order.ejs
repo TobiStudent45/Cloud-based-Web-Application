@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="/css/cart.css" />
+
+<section class="card page-head">
+  <h1>Danke für deine Bestellung!</h1>
+  <p class="muted" id="order-number"></p>
+</section>
+
+<div class="card order-box" id="order-details"></div>
+<p><a class="btn" href="/">Zur Startseite</a></p>
+
+<script>
+  const eur = (c) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(c / 100);
+  const box = document.getElementById("order-details");
+  const id = new URLSearchParams(location.search).get("id") || "";
+  fetch("/api/orders/" + encodeURIComponent(id)).then((r) => r.json()).then((o) => {
+    if (o.error) { box.textContent = o.error; return; }
+    document.getElementById("order-number").textContent = "Bestellnummer: " + o.id;
+    for (const i of o.items) {
+      const row = document.createElement("div");
+      row.className = "row";
+      const name = document.createElement("span");
+      name.textContent = `${i.quantity}× ${i.title}`;
+      const price = document.createElement("span");
+      price.textContent = eur(Number(i.unit_price_cents) * i.quantity);
+      row.append(name, price);
+      box.append(row);
+    }
+    const total = document.createElement("p");
+    total.innerHTML = "<strong></strong>";
+    total.firstChild.textContent = "Gesamt: " + eur(Number(o.total_cents));
+    const addr = document.createElement("p");
+    addr.className = "muted";
+    addr.textContent = `${o.customer_name}, ${o.street}, ${o.postal_code} ${o.city}, ${o.country}`;
+    box.append(total, addr);
+  }).catch(() => { box.textContent = "Bestellung konnte nicht geladen werden."; });
+</script>

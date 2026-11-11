@@ -359,3 +359,5 @@ pre.stub-note { overflow: auto; font-size: 0.8125rem; color: var(--text); }
 .zoom-in main { animation: aureo-zoom-in 0.85s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: 50% 30%; }
 @keyframes aureo-zoom-in { from { opacity: 0; transform: scale(1.12); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .zoom-in main { animation: none; } }
+
+.cart-badge { background: var(--accent); color: #fff; border-radius: 999px; padding: 0 7px; font-size: 12px; line-height: 18px; margin-left: 6px; }

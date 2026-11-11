@@ -6,6 +6,7 @@ const layouts = require("express-ejs-layouts");
 const path = require("path");
 const pages = require("./config/pages");
 const { Readable } = require("stream");
+const crypto = require("crypto");
 const { fetchFromGateway, GATEWAY_URL } = require("./lib/gateway");
 
 const app = express();
@@ -19,6 +20,14 @@ app.set("layout", "layouts/mainLayout");
 app.use(express.static(path.join(__dirname, "public")));
 app.get("/vendor/model-viewer.min.js", (req, res) => {
   res.sendFile(path.join(__dirname, "node_modules/@google/model-viewer/dist/model-viewer.min.js"));
+});
+
+// Anonymous cart id: set once as httpOnly cookie, forwarded to the cart/orders services as x-cart-id.
+app.use((req, res, next) => {
+  const match = /(?:^|;\s*)cart_id=([0-9a-f-]{36})/i.exec(req.headers.cookie || "");
+  req.cartId = match ? match[1] : crypto.randomUUID();
+  if (!match) res.setHeader("Set-Cookie", `cart_id=${req.cartId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`);
+  next();
 });
 
 app.use((req, res, next) => {
@@ -35,6 +44,7 @@ app.all("/api/*", async (req, res) => {
     for (const name of ["range", "if-range", "if-none-match", "if-modified-since", "content-type"]) {
       if (req.headers[name]) headers[name] = req.headers[name];
     }
+    headers["x-cart-id"] = req.cartId;
     const upstream = await fetch(`${GATEWAY_URL}${req.originalUrl}`, {
       headers, method: req.method,
       ...(!["GET", "HEAD"].includes(req.method) ? { body: req, duplex: "half" } : {}),
