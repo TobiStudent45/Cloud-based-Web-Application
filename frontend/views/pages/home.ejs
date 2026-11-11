@@ -24,58 +24,50 @@
   </section>
 
   <div class="wrap stage-wrap">
-      <div class="stage" id="home-stage">
-        <figure class="s-l"><img src="<%= productPicturesUrl %>/sportscar-front-detail.jpg" alt="Frontpartie eines schwarzen Sportwagens" width="800" height="1422" /></figure>
-        <figure class="s-c"><img src="<%= productPicturesUrl %>/sportscar-red-rear.jpg" alt="Roter Sportwagen mit Rundscheinwerfern" width="1200" height="675" /></figure>
-        <figure class="s-r"><img src="<%= productPicturesUrl %>/sportscar-interior.jpg" alt="Cockpit mit Alcantara-Lenkrad" width="800" height="1200" /></figure>
-        <span class="hbadge b1" aria-hidden="true"><i></i>3D live konfigurierbar</span>
-        <span class="hbadge b2" aria-hidden="true">V12 · Handarbeit</span>
-      </div>
-  </div>
-
-  <section class="logos rv" aria-label="Verwendete Technologien">
-    <div class="wrap">
-      <p>GEBAUT MIT</p>
-      <ul>
-        <li>Docker</li><li>Node.js</li><li>MySQL</li><li>Redis</li><li>MinIO</li><li>Gemini</li>
-      </ul>
-    </div>
-  </section>
-
-  <div class="wrap">
-    <div class="stats rv">
-      <div><b data-n="8">8</b><span>Microservices</span></div>
-      <div><b data-n="12">12</b><span>Impressionen</span></div>
-      <div><b data-n="2">2</b><span>3D-Modelle</span></div>
+    <div class="stage" id="home-stage">
+      <figure class="s-l"><img src="<%= productPicturesUrl %>/sportscar-front-detail.jpg" alt="Frontpartie eines schwarzen Sportwagens" width="800" height="1422" /></figure>
+      <figure class="s-c"><img src="<%= productPicturesUrl %>/sportscar-red-rear.jpg" alt="Roter Sportwagen mit Rundscheinwerfern" width="1200" height="675" /></figure>
+      <figure class="s-r"><img src="<%= productPicturesUrl %>/sportscar-interior.jpg" alt="Cockpit mit Alcantara-Lenkrad" width="800" height="1200" /></figure>
+      <span class="hbadge b1" aria-hidden="true"><i></i>3D live konfigurierbar</span>
+      <span class="hbadge b2" aria-hidden="true">Carbon und Alcantara</span>
     </div>
   </div>
 
   <div class="marq rv" aria-label="Fotogalerie">
     <div class="track">
-      <% const marq = ['08', '05', '01', '03', '02', '06', '09', '11']; %>
-      <% marq.forEach(function (n) { %><img src="/api/impressions/images/lamborghini-<%= n %>.jpg" alt="Lamborghini Impression <%= n %>" width="300" height="200" loading="lazy" /><% }); %>
-      <% marq.forEach(function (n) { %><img src="/api/impressions/images/lamborghini-<%= n %>.jpg" alt="" aria-hidden="true" width="300" height="200" loading="lazy" /><% }); %>
+      <% const marq = [
+        ['marquee-01', 'Oranger Sportwagen in Seitenansicht'],
+        ['marquee-02', 'Blauer Sportwagen auf der Straße'],
+        ['marquee-03', 'Weißes Coupé vor einer Ziegelwand'],
+        ['marquee-04', 'Rad mit Bremssattel eines Sportwagens'],
+        ['marquee-05', 'Sportwagen mit Rücklichtern bei Nacht'],
+        ['marquee-06', 'Roter Sportwagen in der Stadt bei Nacht'],
+        ['marquee-07', 'Heckpartie eines grauen Supersportwagens'],
+        ['marquee-08', 'Roter Sportwagen von vorne']
+      ]; %>
+      <% marq.forEach(function (m) { %><img src="<%= productPicturesUrl %>/<%= m[0] %>.jpg" alt="<%= m[1] %>" width="300" height="200" loading="lazy" /><% }); %>
+      <% marq.forEach(function (m) { %><img src="<%= productPicturesUrl %>/<%= m[0] %>.jpg" alt="" aria-hidden="true" width="300" height="200" loading="lazy" /><% }); %>
     </div>
   </div>
 
   <section class="sec" aria-labelledby="home-features">
     <div class="wrap">
       <h2 id="home-features" class="rv">Alles an einem Ort.</h2>
-      <p class="lead rv" style="--d:.1s">Von der ersten Idee bis zum fertigen Fahrzeug – ein durchgängiges Erlebnis.</p>
+      <p class="lead rv" style="--d:.1s">Von der ersten Idee bis zum fertigen Fahrzeug. Ein durchgängiges Erlebnis.</p>
 
       <div class="bento">
         <a class="tile span2 beam rv" href="/configurator">
           <div class="cfg">
             <div>
               <h3>Konfigurator</h3>
-              <p>Lack, Felgen und Innenraum live im 3D-Modell anpassen – inklusive Preisübersicht.</p>
+              <p>Lack, Felgen und Innenraum live im 3D-Modell anpassen, inklusive Preisübersicht.</p>
               <span class="go">Jetzt öffnen <span aria-hidden="true">→</span></span>
             </div>
-            <img src="/api/impressions/images/lamborghini-03.jpg" alt="Lenkrad des Sportwagens" width="600" height="460" loading="lazy" />
+            <img src="<%= productPicturesUrl %>/tile-configurator.jpg" alt="Felge eines hellblauen Sportwagens" width="600" height="460" loading="lazy" />
           </div>
         </a>
         <a class="tile photo rv" href="/impressions" style="--d:.08s">
-          <img src="/api/impressions/images/lamborghini-01.jpg" alt="Innenraum des Sportwagens" width="600" height="500" loading="lazy" />
+          <img src="<%= productPicturesUrl %>/tile-impressions.jpg" alt="Silberner Sportwagen in Seitenansicht" width="600" height="500" loading="lazy" />
           <span class="go-chip" aria-hidden="true">→</span>
           <div class="t"><h3>Impressionen</h3><p>Video und Galerie</p></div>
         </a>
@@ -101,18 +93,22 @@
           <span class="go">Ausprobieren <span aria-hidden="true">→</span></span>
         </a>
         <a class="tile photo span2 rv" href="/impressions" style="--d:.08s">
-          <img src="/api/impressions/images/lamborghini-05.jpg" alt="V12-Motor in Handarbeit gefertigt" width="1000" height="500" loading="lazy" />
+          <img src="<%= productPicturesUrl %>/tile-v12.jpg" alt="V12-Motor mit Typenschild" width="1000" height="500" loading="lazy" />
           <span class="go-chip" aria-hidden="true">→</span>
-          <div class="t"><h3>V12 – Handarbeit</h3><p>Technik, die man sehen darf.</p></div>
+          <div class="t"><h3>V12 Handarbeit</h3><p>Technik, die man sehen darf.</p></div>
         </a>
       </div>
 
-      <div class="cta rv">
-        <img src="/api/impressions/images/lamborghini-08.jpg" alt="" aria-hidden="true" width="1000" height="600" loading="lazy" />
-        <h2>Bereit für deine Konfiguration?</h2>
-        <p class="lead">Starte den Konfigurator und gestalte dein Fahrzeug.</p>
-        <a class="hbtn light" href="/configurator">Konfigurator starten <span aria-hidden="true">→</span></a>
-      </div>
+      <section class="closing rv" aria-labelledby="home-closing">
+        <div class="closing-bg" aria-hidden="true">
+          <span class="hero-grid"></span>
+          <span class="hero-orb o1"></span>
+          <span class="hero-orb o2"></span>
+        </div>
+        <h2 id="home-closing">Dein Fahrzeug wartet.</h2>
+        <p class="lead">Wähle ein Modell, gestalte Farbe und Innenraum und sieh den Preis sofort.</p>
+        <div class="hbtns"><a class="hcta" href="/configurator">Konfigurator starten <span class="arrow" aria-hidden="true">→</span></a></div>
+      </section>
     </div>
   </section>
 </div>

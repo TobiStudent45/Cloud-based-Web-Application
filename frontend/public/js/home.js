@@ -1,4 +1,4 @@
-/* Home page behaviour: reveal, hero parallax, counters, card spotlight. */
+/* Home page behaviour: reveal, hero parallax, card spotlight. */
 (function () {
   var home = document.querySelector('.home');
   if (!home) return;
@@ -13,19 +13,6 @@
     }, { threshold: 0.12 });
     home.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
 
-    var cio = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        var el = e.target, n = +el.dataset.n, i = 0;
-        el.textContent = '0';
-        var t = setInterval(function () {
-          i++; el.textContent = i;
-          if (i >= n) clearInterval(t);
-        }, Math.max(40, 700 / n));
-        cio.unobserve(el);
-      });
-    }, { threshold: 0.6 });
-    home.querySelectorAll('[data-n]').forEach(function (el) { cio.observe(el); });
   }
 
   var stage = document.getElementById('home-stage');
