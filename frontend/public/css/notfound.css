@@ -1,15 +1,20 @@
 /* Styles for the 404 page. */
-.nf { position: relative; overflow: hidden; isolation: isolate; display: grid; place-items: center; min-height: min(70vh, 560px); padding: 64px 24px; border-radius: 28px; text-align: center; color: #fff; background: #0a0a0a; }
-.nf > img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.45) saturate(1.1); animation: nf-zoom 24s ease-in-out infinite alternate; }
-.nf::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(10, 10, 10, 0.55), rgba(10, 10, 10, 0.1) 80%); }
-.nf-body { max-width: 560px; }
-.nf-code { margin: 0; font-size: clamp(96px, 22vw, 220px); font-weight: 600; line-height: 0.9; letter-spacing: -0.07em; background: linear-gradient(180deg, #fff 20%, rgba(255, 255, 255, 0.25)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.nf h1 { margin: 12px 0 10px; font-size: clamp(1.6rem, 4vw, 2.4rem); letter-spacing: -0.03em; color: #fff; }
-.nf-text { margin: 0 auto 28px; color: rgba(255, 255, 255, 0.82); font-size: 1.0625rem; }
-.nf-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 24px; }
-.nf .btn { background: #fff; color: #0a0a0a; border: 0; padding: 14px 26px; border-radius: 999px; }
-.nf .btn:hover { background: #fff; color: #0a0a0a; }
-.nf-link { color: rgba(255, 255, 255, 0.9); font-weight: 500; }
-.nf-link:hover { color: #fff; text-decoration: underline; }
-@keyframes nf-zoom { from { transform: scale(1); } to { transform: scale(1.12); } }
-@media (prefers-reduced-motion: reduce) { .nf > img { animation: none; } }
+.nf { position: relative; overflow: hidden; isolation: isolate; display: grid; place-items: center; min-height: min(70vh, 560px); padding: 48px 24px; border: 1px solid var(--border); border-radius: 28px; text-align: center; background: #fff; }
+.nf::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(circle at 18% 20%, rgba(91, 91, 240, 0.16), transparent 42%), radial-gradient(circle at 82% 78%, rgba(34, 211, 238, 0.16), transparent 42%); animation: nf-glow 10s ease-in-out infinite alternate; }
+.nf-body { max-width: 520px; }
+.nf-figure { display: block; margin: 0 auto 4px; overflow: visible; }
+.nf-code { margin: 0; font-size: clamp(72px, 14vw, 128px); font-weight: 600; line-height: 1; letter-spacing: -0.06em; background: linear-gradient(180deg, #0a0a0a 30%, #a1a1aa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.nf h1 { margin: 8px 0 10px; font-size: clamp(1.5rem, 4vw, 2.1rem); letter-spacing: -0.03em; }
+.nf-text { margin: 0 auto 26px; max-width: 42ch; color: var(--text-muted); font-size: 1.0625rem; }
+.nf-head { transform-origin: 120px 132px; animation: nf-tilt 4.5s ease-in-out infinite alternate; }
+.nf-pupil { animation: nf-look 5s ease-in-out infinite; }
+.nf-arms { animation: nf-shrug 2.6s ease-in-out infinite; }
+.nf-q text { animation: nf-bob 2.4s ease-in-out infinite alternate; }
+.nf-q text:nth-child(2) { animation-delay: -0.8s; }
+.nf-q text:nth-child(3) { animation-delay: -1.6s; }
+@keyframes nf-tilt { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
+@keyframes nf-look { 0%, 12% { transform: translate(-5px, 1px); } 38%, 58% { transform: translate(5px, -1px); } 86%, 100% { transform: translate(-5px, 1px); } }
+@keyframes nf-shrug { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes nf-bob { from { transform: translateY(0); opacity: 0.55; } to { transform: translateY(-8px); opacity: 1; } }
+@keyframes nf-glow { from { opacity: 0.6; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .nf::before, .nf-head, .nf-pupil, .nf-arms, .nf-q text { animation: none; } }

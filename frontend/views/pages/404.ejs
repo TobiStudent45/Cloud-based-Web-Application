@@ -1,14 +1,35 @@
 <link rel="stylesheet" href="/css/notfound.css" />
 
 <section class="nf" aria-labelledby="nf-title">
-  <img src="<%= productPicturesUrl %>/marquee-05.jpg" alt="" aria-hidden="true" width="900" height="600" />
   <div class="nf-body">
+    <svg class="nf-figure" viewBox="0 0 240 240" width="190" height="190" role="img" aria-label="Eine verwirrte Figur zuckt mit den Schultern">
+      <ellipse cx="120" cy="228" rx="72" ry="7" fill="rgba(10,10,10,.08)" />
+      <g class="nf-q">
+        <text x="52" y="44" font-size="34" font-weight="700" fill="#5b5bf0">?</text>
+        <text x="112" y="28" font-size="46" font-weight="700" fill="#22b8d4">?</text>
+        <text x="176" y="48" font-size="28" font-weight="700" fill="#8b7cf6">?</text>
+      </g>
+      <g class="nf-arms">
+        <path d="M70 166 L30 134" stroke="#0a0a0a" stroke-width="16" stroke-linecap="round" fill="none" />
+        <path d="M170 166 L210 134" stroke="#0a0a0a" stroke-width="16" stroke-linecap="round" fill="none" />
+        <circle cx="24" cy="128" r="10" fill="#fff" stroke="#0a0a0a" stroke-width="4" />
+        <circle cx="216" cy="128" r="10" fill="#fff" stroke="#0a0a0a" stroke-width="4" />
+      </g>
+      <path d="M62 228 V172 a40 40 0 0 1 40 -40 h36 a40 40 0 0 1 40 40 V228 Z" fill="#0a0a0a" />
+      <g class="nf-head">
+        <circle cx="120" cy="92" r="44" fill="#fff" stroke="#0a0a0a" stroke-width="5" />
+        <circle cx="104" cy="92" r="11" fill="#fff" stroke="#0a0a0a" stroke-width="3" />
+        <circle cx="136" cy="92" r="11" fill="#fff" stroke="#0a0a0a" stroke-width="3" />
+        <circle class="nf-pupil" cx="104" cy="92" r="5" fill="#0a0a0a" />
+        <circle class="nf-pupil" cx="136" cy="92" r="5" fill="#0a0a0a" />
+        <path d="M91 76 Q103 68 115 74" stroke="#0a0a0a" stroke-width="4" stroke-linecap="round" fill="none" />
+        <path d="M125 70 Q138 62 151 72" stroke="#0a0a0a" stroke-width="4" stroke-linecap="round" fill="none" />
+        <path d="M106 116 q7 -6 14 0 t14 0" stroke="#0a0a0a" stroke-width="4" stroke-linecap="round" fill="none" />
+      </g>
+    </svg>
     <p class="nf-code" aria-hidden="true">404</p>
     <h1 id="nf-title">Seite nicht gefunden</h1>
-    <p class="nf-text">Diese Seite gibt es nicht, oder du hast dich vertippt. Hier geht es leider nicht weiter, aber zurück auf die Strecke kommst du schnell.</p>
-    <div class="nf-actions">
-      <a class="btn" href="/">Zur Startseite</a>
-      <a class="nf-link" href="/configurator">Zum Konfigurator</a>
-    </div>
+    <p class="nf-text">Diese Seite gibt es nicht, oder du hast dich vertippt. Hier geht es leider nicht weiter.</p>
+    <a class="btn" href="/">Zurück zur Startseite</a>
   </div>
 </section>
