@@ -1,3 +1,5 @@
+// productinfo microservice (stub): JSON only, internal port 3000, reached through the gateway at /api/productinfo.
+
 const express = require("express");
 
 const app = express();
@@ -9,8 +11,6 @@ const SERVICE_NAME = "productinfo";
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: SERVICE_NAME });
 });
-
-// TODO: Fachliche Routen des Service hier ergänzen
 
 app.listen(PORT, () => {
   console.log(`[${SERVICE_NAME}] läuft auf Port ${PORT}`);

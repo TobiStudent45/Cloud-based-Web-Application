@@ -1,5 +1,5 @@
-// Microservice: impressions
-// GET /images (Liste aller Bilder im Bucket), GET /images/:key
+// impressions microservice: GET /images, GET /images/:key.
+// Creates the bucket and seeds it from seed-images on startup.
 
 const express = require("express");
 const fs = require("fs");
@@ -65,7 +65,6 @@ app.get("/images/:key", async (req, res) => {
   }
 });
 
-// Beim Start Bucket anlegen und fehlende Bilder aus seed-images hochladen
 const SEED_DIR = path.join(__dirname, "seed-images");
 
 async function seedImages() {
