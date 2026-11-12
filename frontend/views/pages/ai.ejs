@@ -1,12 +1,86 @@
-<section class="card page-head">
-  <h1>AI Feature</h1>
-  <p class="muted">Kreatives AI-Feature mit Google Gemini.</p>
-</section>
+<link rel="stylesheet" href="/css/ai.css" />
 
-<% if (apiError) { %>
-  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
-<% } else if (data) { %>
-  <pre class="stub-note"><%= JSON.stringify(data, null, 2) %></pre>
-<% } else { %>
-  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
-<% } %>
+<section class="ai-feature" aria-labelledby="ai-title">
+  <header class="ai-heading">
+    <p class="ai-eyebrow">Aureo / AI Feature</p>
+    <h1 id="ai-title">Du. Am Steuer.</h1>
+    <p class="muted">Lade ein Foto von dir hoch: Google Gemini erkennt deinen Look, und wir setzen dich als Illustration ans Steuer deines konfigurierten Aureo.</p>
+  </header>
+
+  <% if (apiError) { %>
+    <div class="card" role="alert">
+      <h2>AI-Service nicht erreichbar</h2>
+      <p class="muted">Bitte versuche es in einem Moment erneut.</p>
+      <a href="/ai" class="btn">Erneut versuchen</a>
+    </div>
+  <% } else { %>
+    <% if (data && data.configured === false) { %>
+      <div class="ai-alert" role="alert">Es ist noch kein Gemini-API-Schlüssel hinterlegt. Trage <code>GEMINI_API_KEY</code> in die <code>.env</code> ein und starte die Container neu.</div>
+    <% } %>
+
+    <form class="ai-layout" id="ai-form" novalidate>
+      <section class="card ai-step" aria-labelledby="ai-car-title">
+        <p class="ai-eyebrow">01 / Dein Fahrzeug</p>
+        <h2 id="ai-car-title">Dein konfigurierter Aureo</h2>
+        <div class="ai-car" id="ai-car" hidden>
+          <img id="ai-car-image" alt="Dein konfiguriertes Fahrzeug" />
+          <div>
+            <strong id="ai-car-name"></strong>
+            <ul class="ai-car-config muted" id="ai-car-config"></ul>
+          </div>
+        </div>
+        <div class="ai-empty" id="ai-car-empty">
+          <p class="muted">Noch kein Fahrzeug gewählt. Gestalte deinen Aureo im Konfigurator und klicke dort auf <em>„Mich im Auto sehen“</em>.</p>
+          <a class="btn" href="/configurator">Zum Konfigurator</a>
+        </div>
+        <a class="ai-link" id="ai-car-change" href="/configurator" hidden>Fahrzeug ändern</a>
+      </section>
+
+      <section class="card ai-step" aria-labelledby="ai-photo-title">
+        <p class="ai-eyebrow">02 / Dein Foto</p>
+        <h2 id="ai-photo-title">Ein Foto von dir</h2>
+        <label class="ai-drop" id="ai-drop">
+          <input type="file" id="ai-selfie" accept="image/jpeg,image/png,image/webp" capture="user" />
+          <img id="ai-selfie-preview" alt="Vorschau deines Fotos" hidden />
+          <span id="ai-drop-text">Foto auswählen oder hierher ziehen<br /><small class="muted">Am besten: nur du, Gesicht gut beleuchtet, von vorne</small></span>
+        </label>
+
+        <label class="ai-field" for="ai-scene">Umgebung</label>
+        <select class="ai-select" id="ai-scene">
+          <option value="sunset">Küstenstraße bei Sonnenuntergang</option>
+          <option value="city">Großstadt bei Nacht</option>
+          <option value="mountains">Alpenpass</option>
+          <option value="studio">Showroom</option>
+        </select>
+
+        <label class="ai-consent">
+          <input type="checkbox" id="ai-consent" />
+          <span>Ich bin damit einverstanden, dass mein Foto zur Analyse an Google Gemini gesendet wird. Es wird von Aureo nicht gespeichert.</span>
+        </label>
+
+        <button type="submit" class="btn ai-submit" id="ai-submit" disabled>Bild erstellen</button>        <p class="ai-status muted" id="ai-status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="card ai-step ai-result-card" aria-labelledby="ai-result-title">
+        <p class="ai-eyebrow">03 / Ergebnis</p>
+        <h2 id="ai-result-title">Dein Moment</h2>
+        <div class="ai-result" id="ai-result" aria-busy="false">
+          <p class="muted" id="ai-result-empty">Hier erscheint dein Bild.</p>
+          <div class="ai-loader" id="ai-loader" hidden><span></span><p id="ai-loader-text">Gemini schaut sich dein Foto an …</p></div>
+          <img id="ai-result-image" alt="Illustration: du in deinem Aureo" hidden />
+        </div>
+        <div class="ai-actions" id="ai-actions" hidden>
+          <a class="btn" id="ai-download" download="aureo-portrait.png">Herunterladen</a>
+          <button type="button" class="btn btn-outline" id="ai-retry">Nochmal versuchen</button>
+        </div>
+        <details class="ai-traits" id="ai-traits" hidden>
+          <summary>Was Gemini erkannt hat</summary>
+          <dl id="ai-traits-list"></dl>
+        </details>
+        <p class="muted ai-note">Merkmale und Spruch von Google Gemini, Illustration von Aureo. Ergebnisse können abweichen.</p>
+      </section>
+    </form>
+    <noscript><p class="stub-note">Aktiviere JavaScript, um das AI Feature zu nutzen.</p></noscript>
+    <script type="module" src="/js/ai.js"></script>
+  <% } %>
+</section>

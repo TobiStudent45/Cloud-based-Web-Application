@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/css/configurator.css" />
+<link rel="stylesheet" href="/css/ai.css" />
 
 <section class="configurator" aria-labelledby="configurator-title">
   <header class="configurator-heading">
@@ -91,6 +92,7 @@
         <div class="configurator-toolbar">
           <p class="muted">Ziehen zum Drehen · Scrollen oder zwei Finger zum Zoomen</p>
           <button type="button" class="configurator-reset" id="reset-car-camera" disabled>Ansicht zurücksetzen</button>
+          <button type="button" class="configurator-reset ai-config-button" id="ai-open" disabled>Mich im Auto sehen · AI</button>
         </div>
         <div class="configurator-summary" id="configuration-summary" hidden>
           <p class="configurator-eyebrow">Deine Auswahl</p>
@@ -124,5 +126,6 @@
     </div>
     <noscript><p class="stub-note">Aktiviere JavaScript, um Fahrzeuge zu wechseln und in 3D zu betrachten.</p></noscript>
     <script type="module" src="/js/configurator.js"></script>
+    <script type="module" src="/js/ai-configurator.js"></script>
   <% } %>
 </section>
