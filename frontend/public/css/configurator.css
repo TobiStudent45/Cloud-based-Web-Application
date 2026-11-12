@@ -1,9 +1,28 @@
 .configurator-heading { margin: 12px 0 28px; }
 .configurator-heading h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.15; }
 .configurator-eyebrow { margin: 0 0 12px; color: var(--text-muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .13em; }
-.configurator-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: var(--gap); align-items: start; }
-.configurator-sidebar { display: grid; gap: var(--gap); min-width: 0; }
-.configurator-selection h2 { font-size: 1.2rem; margin-bottom: 24px; }
+.configurator-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-areas: "preview steps" "pricing steps"; gap: var(--gap); align-items: start; }
+.configurator-layout > * { min-width: 0; }
+.configurator-steps { grid-area: steps; display: grid; gap: var(--gap); }
+.configurator-preview { grid-area: preview; }
+.configurator-step { padding: 0; overflow: hidden; }
+.configurator-step-heading { position: relative; padding: 20px 42px 20px 20px; list-style: none; cursor: pointer; }
+.configurator-step-heading::-webkit-details-marker { display: none; }
+.configurator-step-heading::after { content: "+"; position: absolute; top: 18px; right: 20px; color: var(--text-muted); font-size: 1.25rem; }
+.configurator-step[open] > .configurator-step-heading::after { content: "−"; }
+.configurator-step-heading .configurator-eyebrow { display: block; margin-bottom: 8px; }
+.configurator-step-title { display: block; font-size: 1.1rem; font-weight: 600; }
+.configurator-step-meta { display: block; margin-top: 8px; color: var(--text-muted); font-size: .8rem; }
+.configurator-step-meta[hidden] { display: none; }
+.configurator-step:not([open]) > .configurator-step-heading { padding: 14px 42px 14px 20px; }
+.configurator-step:not([open]) > .configurator-step-heading .configurator-eyebrow { margin-bottom: 0; }
+.configurator-step:not([open]) > .configurator-step-heading .configurator-step-title,
+.configurator-step:not([open]) > .configurator-step-heading .configurator-step-meta { display: none; }
+.configurator-step:not([open]) > .configurator-step-heading::after { top: 50%; transform: translateY(-50%); }
+.configurator-step-heading[aria-disabled="true"] { cursor: default; }
+.configurator-step-heading[aria-disabled="true"]::after { opacity: .4; }
+.configurator-step-heading:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; border-radius: var(--radius-lg); }
+.configurator-step-content { padding: 0 20px 20px; }
 .configurator-models { display: grid; gap: 12px; }
 .configurator-model { display: flex; align-items: center; gap: 14px; width: 100%; padding: 18px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
 .configurator-model:hover { border-color: var(--text-muted); }
@@ -36,7 +55,6 @@
 .configurator-toolbar p { margin: 0; font-size: .75rem; }
 .configurator-reset { flex-shrink: 0; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font: inherit; font-size: .75rem; background: var(--surface-2); color: var(--text); cursor: pointer; }
 .configurator-reset:disabled { opacity: .4; cursor: not-allowed; }
-.configurator-customization h2 { font-size: 1.2rem; margin-bottom: 10px; }
 .configurator-area-switch { display: flex; padding: 4px; gap: 4px; margin: 18px 0 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
 .configurator-area-switch[hidden] { display: none; }
 .configurator-area-switch button { flex: 1; padding: 8px 12px; border: 0; border-radius: 6px; color: var(--text-muted); background: transparent; font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
@@ -65,7 +83,7 @@
 .configurator-summary dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; }
 .configurator-summary dt { font-size: .7rem; color: var(--text-muted); }
 .configurator-summary dd { font-size: .8rem; margin: 4px 0 0; }
-.configurator-pricing { padding: 20px 24px 24px; border-top: 1px solid var(--border); }
+.configurator-pricing { grid-area: pricing; padding: 20px 24px 24px; }
 .configurator-pricing h2 { font-size: 1.1rem; }
 .configurator-price-lines { display: grid; gap: 8px; margin: 18px 0 12px; }
 .configurator-price-lines > div { display: flex; justify-content: space-between; gap: 16px; }
@@ -85,14 +103,12 @@
 .configurator-save-status { margin: 12px 0 6px; min-height: 1.5em; }
 .configurator-save-status[data-error="true"] { color: #fca5a5; }
 @media (max-width: 900px) {
-  .configurator-layout { grid-template-columns: 1fr; }
-  .configurator-preview { position: static; }
-  .configurator-sidebar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .configurator-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "steps" "preview" "pricing"; }
+  #customization-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; align-items: start; }
   .configurator-models { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .configurator-selection-note { margin-top: 14px; }
 }
 @media (max-width: 640px) {
-  .configurator-sidebar { grid-template-columns: 1fr; }
+  #customization-options { grid-template-columns: minmax(0, 1fr); }
   .configurator-summary dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 480px) {

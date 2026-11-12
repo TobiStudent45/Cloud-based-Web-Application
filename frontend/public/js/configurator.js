@@ -22,14 +22,36 @@ if (root) {
   const interiorViews = root.querySelector("#interior-camera-views");
   const interiorViewButtons = [...interiorViews.querySelectorAll("[data-interior-view]")];
   const viewLabel = root.querySelector("#car-view-label");
+  const selectionStep = root.querySelector("#model-selection-step");
+  const customizationStep = root.querySelector("#customization-step");
+  const selectionHeading = root.querySelector("#model-selection-title");
+  const customizationHeading = customizationStep.querySelector("summary");
+  const chosenCarLabel = root.querySelector("#chosen-car-label");
+  const stepHint = root.querySelector("#customization-step-hint");
+  const pricingPanel = root.querySelector(".configurator-pricing");
+  const priceBadge = root.querySelector("#configuration-price-badge");
+  let modelChosen = false;
+
+  customizationHeading.addEventListener("click", (event) => {
+    if (!modelChosen) event.preventDefault();
+  });
+  for (const step of [selectionStep, customizationStep]) {
+    step.addEventListener("toggle", () => {
+      if (step.open) {
+        const other = step === selectionStep ? customizationStep : selectionStep;
+        other.open = false;
+      }
+      selectionHeading.textContent = selectionStep.open ? "Welches Modell passt zu dir?" : "Dein Modell";
+    });
+  }
   const interiorCameras = {
     lambo: {
       seats: { target: "0m 0.55m -0.15m", orbit: "-25deg 70deg 0.95m", fieldOfView: "85deg" },
       cockpit: { target: "0m 0.65m 0.8m", orbit: "180deg 75deg 1.1m", fieldOfView: "80deg" },
     },
-    beetle: {
-      seats: { target: "0.1m 0.9m -0.3m", orbit: "-20deg 70deg 0.95m", fieldOfView: "85deg" },
-      cockpit: { target: "0.1m 1m 0.55m", orbit: "180deg 75deg 0.85m", fieldOfView: "80deg" },
+    urus: {
+      seats: { target: "0m 0.95m -0.4m", orbit: "-20deg 75deg 0.85m", fieldOfView: "85deg" },
+      cockpit: { target: "0m 1m 0.8m", orbit: "180deg 75deg 1m", fieldOfView: "80deg" },
     },
   };
   let activeCarId = null;
@@ -64,7 +86,7 @@ if (root) {
     interiorViews.hidden = area !== "interior" || !interiorCameras[activeCarId];
     viewLabel.textContent = area === "interior" ? "3D / Innenraum" : "3D / Außenansicht";
     customizationStatus.textContent = area === "interior"
-      ? "Gestalte die Farben von Sitzen und Innenverkleidung."
+      ? "Gestalte Lederflächen, Alcantara und Sicherheitsgurte."
       : "Deine Auswahl erscheint direkt am Fahrzeug.";
     if (moveCamera) resetCamera();
   }
@@ -84,6 +106,9 @@ if (root) {
     for (const [material, original] of originalMaterials) {
       const pbr = material.pbrMetallicRoughness;
       pbr.setBaseColorFactor(original.baseColor);
+      if (pbr.baseColorTexture && pbr.baseColorTexture.texture !== original.baseColorTexture) {
+        pbr.baseColorTexture.setTexture(original.baseColorTexture);
+      }
       pbr.setMetallicFactor(original.metallic);
       pbr.setRoughnessFactor(original.roughness);
       material.setClearcoatFactor(original.clearcoat);
@@ -102,6 +127,7 @@ if (root) {
         const values = choice.values;
         const pbr = material.pbrMetallicRoughness;
         if (values.baseColor !== undefined) pbr.setBaseColorFactor(values.baseColor);
+        if (values.removeBaseColorTexture && pbr.baseColorTexture) pbr.baseColorTexture.setTexture(null);
         if (values.metallic !== undefined) pbr.setMetallicFactor(values.metallic);
         if (values.roughness !== undefined) pbr.setRoughnessFactor(values.roughness);
         if (values.clearcoat !== undefined) material.setClearcoatFactor(values.clearcoat);
@@ -129,6 +155,7 @@ if (root) {
         const pbr = material.pbrMetallicRoughness;
         originalMaterials.set(material, {
           baseColor: [...pbr.baseColorFactor], metallic: pbr.metallicFactor,
+          baseColorTexture: pbr.baseColorTexture?.texture || null,
           roughness: pbr.roughnessFactor, clearcoat: material.clearcoatFactor,
           clearcoatRoughness: material.clearcoatRoughnessFactor,
         });
@@ -242,11 +269,28 @@ if (root) {
     viewer = null;
 
     if (button.dataset.available !== "true") {
+      modelChosen = false;
+      selectionStep.open = true;
+      customizationStep.open = false;
+      customizationHeading.setAttribute("aria-disabled", "true");
+      stepHint.hidden = false;
+      chosenCarLabel.hidden = true;
+      pricingPanel.hidden = priceBadge.hidden = true;
       showStatus("Das 3D-Modell für " + button.dataset.carName + " ist noch nicht verfügbar.");
       customizationStatus.textContent = "Anpassungen sind verfügbar, sobald das 3D-Modell hinterlegt ist.";
       pricing.reset("Speichern ist möglich, sobald das 3D-Modell verfügbar ist.");
       return;
     }
+
+    modelChosen = true;
+    chosenCarLabel.textContent = button.dataset.carName;
+    chosenCarLabel.hidden = false;
+    customizationHeading.setAttribute("aria-disabled", "false");
+    stepHint.hidden = true;
+    selectionStep.open = false;
+    customizationStep.open = true;
+    pricingPanel.hidden = priceBadge.hidden = false;
+    customizationHeading.focus({ preventScroll: true });
 
     const options = fetch("/api/configurator/cars/" + encodeURIComponent(button.dataset.carId) + "/options", {
       signal: AbortSignal.timeout(10000),
@@ -270,6 +314,8 @@ if (root) {
       element.setAttribute("exposure", "1");
       element.setAttribute("loading", "eager");
       element.setAttribute("interaction-prompt", "none");
+      // This GLB was exported at 1:100; cameras use metres like the other vehicle.
+      if (activeCarId === "urus") element.setAttribute("scale", "100 100 100");
       element.addEventListener("progress", (event) => {
         if (selection !== current || status.hidden) return;
         const progress = Math.round(event.detail.totalProgress * 100);
@@ -305,10 +351,9 @@ if (root) {
 
   buttons.forEach((button) => button.addEventListener("click", () => selectCar(button)));
   reset.addEventListener("click", resetCamera);
-  const defaultButton = buttons.find((button) => button.dataset.available === "true") || buttons[0];
   const savedId = new URLSearchParams(location.search).get("configuration");
   async function initializePage() {
-    if (!savedId) return selectCar(defaultButton);
+    if (!savedId) return;
     try {
       const response = await fetch("/api/configurator/configurations/" + encodeURIComponent(savedId), { signal: AbortSignal.timeout(10000) });
       const snapshot = await response.json();
@@ -316,13 +361,15 @@ if (root) {
       if (selection) return;
       const button = buttons.find((item) => item.dataset.carId === snapshot.vehicle.id);
       if (!button) throw new Error("Das gespeicherte Fahrzeug ist nicht mehr verfügbar.");
-      choicesByCar.set(snapshot.vehicle.id, new Map(snapshot.selections.map((item) => [item.groupId, item.choiceId])));
+      choicesByCar.set(snapshot.vehicle.id, new Map(snapshot.selections.map((item) => [
+        snapshot.vehicle.id === "urus" && item.groupId === "interior-seat-accents" ? "interior-leather" : item.groupId,
+        item.choiceId,
+      ])));
       pricing.remember(snapshot);
       await selectCar(button);
     } catch (error) {
       if (selection) return;
-      await selectCar(defaultButton);
-      pricing.message("Die gespeicherte Konfiguration konnte nicht geladen werden: " + error.message, true);
+      showStatus("Die gespeicherte Konfiguration konnte nicht geladen werden. Wähle ein Modell, um neu zu starten.");
     }
   }
   initializePage();

@@ -24,8 +24,8 @@ const db = mysql.createPool({
 
 async function findCars(id) {
   const [rows] = await db.execute(
-    "SELECT id, name, description, model_file, base_price_cents FROM configurator_cars" +
-      (id ? " WHERE id = ?" : " ORDER BY sort_order, id"),
+    "SELECT id, name, description, model_file, base_price_cents FROM configurator_cars WHERE is_active = TRUE" +
+      (id ? " AND id = ?" : " ORDER BY sort_order, id"),
     id ? [id] : []
   );
   return rows;
@@ -200,17 +200,25 @@ async function start() {
   }
   const [priceColumn] = await db.query("SHOW COLUMNS FROM configurator_cars LIKE 'base_price_cents'");
   if (!priceColumn.length) await db.query("ALTER TABLE configurator_cars ADD COLUMN base_price_cents INT UNSIGNED NULL");
+  const [activeColumn] = await db.query("SHOW COLUMNS FROM configurator_cars LIKE 'is_active'");
+  if (!activeColumn.length) await db.query("ALTER TABLE configurator_cars ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT TRUE");
   await db.execute(
     "INSERT IGNORE INTO configurator_cars (id, name, description, model_file, sort_order) VALUES " +
       "(?, ?, ?, ?, ?), (?, ?, ?, ?, ?)",
     [
-      "lambo", "Lambo", "Entdecke das Fahrzeug aus jeder Perspektive.", "Lambo.glb", 1,
-      "beetle", "Beetle", "Ein Klassiker, ganz nach deinem Stil.", "Beetle-web.glb", 2,
+      "lambo", "Lamborghini Aventador", "Entdecke das Fahrzeug aus jeder Perspektive.", "Lambo.glb", 1,
+      "urus", "Lamborghini Urus SE", "Sportlichkeit trifft auf SUV-Komfort. Gestalte deinen Urus.", "lambo-urus.glb", 2,
     ]
   );
+  await db.execute("UPDATE configurator_cars SET name = ? WHERE id = ? AND name = ?",
+    ["Lamborghini Aventador", "lambo", "Lambo"]);
+  // Keep the retired vehicle row for foreign keys and immutable saved JSON snapshots.
+  await db.execute("UPDATE configurator_cars SET is_active = FALSE WHERE id = ?", ["beetle"]);
   await db.execute("DELETE FROM configurator_cars WHERE id = ? AND name = ? AND model_file = ?",
     ["model-2", "Fahrzeug 2", "model-2.glb"]);
   await db.execute("DELETE FROM configurator_option_groups WHERE id = ?", ["interior-stitching"]);
+  // The original Urus seat panels are now configured under the shared leather group.
+  await db.execute("DELETE FROM configurator_option_groups WHERE car_id = ? AND id = ?", ["urus", "interior-seat-accents"]);
   for (const [carId, groups] of Object.entries(optionGroups)) {
     await db.execute("UPDATE configurator_cars SET base_price_cents = ? WHERE id = ? AND base_price_cents IS NULL", [priceCatalog[carId].basePriceCents, carId]);
     for (const [index, group] of groups.entries()) {
@@ -218,6 +226,18 @@ async function start() {
         "INSERT IGNORE INTO configurator_option_groups (car_id, id, label, section, material_names, choices, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)",
         [carId, group.id, group.label, group.section || "exterior", JSON.stringify(group.materialNames), JSON.stringify(group.choices), index]
       );
+      if (carId === "urus") {
+        await db.execute("UPDATE configurator_option_groups SET sort_order = ? WHERE car_id = ? AND id = ?", [index, carId, group.id]);
+      }
+      // Keep the compact paint/finish selection in sync for existing databases too.
+      if (["paint", "finish"].includes(group.id)) {
+        await db.execute("UPDATE configurator_option_groups SET choices = ? WHERE car_id = ? AND id = ?",
+          [JSON.stringify(group.choices), carId, group.id]);
+        await db.execute(
+          "DELETE FROM configurator_choice_prices WHERE car_id = ? AND group_id = ? AND choice_id NOT IN (" + group.choices.map(() => "?").join(", ") + ")",
+          [carId, group.id, ...group.choices.map((choice) => choice.id)]
+        );
+      }
       for (const choice of group.choices) {
         const price = choice.id === "original" ? 0 : priceCatalog[carId].extras[group.id]?.[choice.id];
         if (!Number.isSafeInteger(price) || price < 0) throw new Error("Missing demo price: " + carId + "/" + group.id + "/" + choice.id);

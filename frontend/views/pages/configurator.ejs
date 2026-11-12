@@ -4,7 +4,6 @@
   <header class="configurator-heading">
     <p class="configurator-eyebrow">Aureo / Konfigurator</p>
     <h1 id="configurator-title">Dein Fahrzeug. Deine Perspektive.</h1>
-    <p class="muted">Wähle dein Modell und gestalte Außen- und Innenraum in 3D.</p>
   </header>
 
   <% if (apiError) { %>
@@ -17,51 +16,62 @@
     <div class="card"><p>Noch keine Fahrzeuge verfügbar.</p></div>
   <% } else { %>
     <div class="configurator-layout" id="car-configurator">
-      <div class="configurator-sidebar">
-       <aside class="card configurator-selection" aria-labelledby="model-selection-title">
-        <p class="configurator-eyebrow">01 / Modellauswahl</p>
-        <h2 id="model-selection-title">Welches Modell passt zu dir?</h2>
-        <div class="configurator-models" role="group" aria-label="Fahrzeug auswählen">
-          <% data.forEach(function (car, index) { %>
-            <button type="button" class="configurator-model"
-              aria-pressed="<%= index === 0 ? 'true' : 'false' %>"
-              data-car-id="<%= car.id %>"
-              data-car-name="<%= car.name %>"
-              data-car-description="<%= car.description %>"
-              data-model-url="<%= car.modelUrl %>"
-              data-available="<%= car.available ? 'true' : 'false' %>">
-              <span class="configurator-model-number">0<%= index + 1 %></span>
-              <span>
-                <strong><%= car.name %></strong>
-                <span class="configurator-model-caption"><%= car.available ? 'In 3D entdecken' : '3D-Modell folgt' %></span>
-              </span>
-              <span class="configurator-model-arrow" aria-hidden="true">↗</span>
-            </button>
-          <% }); %>
-        </div>
-        <p class="muted configurator-selection-note">Wähle ein Fahrzeug für die Rundumansicht.</p>
-       </aside>
-       <section class="card configurator-customization" aria-labelledby="customization-title">
-         <p class="configurator-eyebrow">02 / Dein Stil</p>
-         <h2 id="customization-title">Mach ihn zu deinem.</h2>
-         <div class="configurator-area-switch" id="customization-areas" role="group" aria-label="Fahrzeugbereich auswählen" hidden>
-           <button type="button" data-area="exterior" aria-pressed="true">Außen</button>
-           <button type="button" data-area="interior" aria-pressed="false">Innen</button>
-         </div>
-         <p class="muted configurator-customization-note" id="customization-status" role="status">Anpassungen werden vorbereitet …</p>
-         <div id="customization-options"></div>
-         <button type="button" class="configurator-reset configurator-reset-all" id="reset-car-configuration" hidden disabled>Original wiederherstellen</button>
-       </section>
-      </div>
+      <aside class="configurator-steps" aria-label="Fahrzeug konfigurieren">
+        <details class="card configurator-step configurator-selection" id="model-selection-step" name="configurator-steps" open>
+          <summary class="configurator-step-heading">
+            <span class="configurator-eyebrow">01 / Modellauswahl</span>
+            <span class="configurator-step-title" id="model-selection-title">Welches Modell passt zu dir?</span>
+            <span class="configurator-step-meta" id="chosen-car-label" hidden></span>
+          </summary>
+          <div class="configurator-step-content">
+            <div class="configurator-models" role="group" aria-label="Fahrzeug auswählen">
+              <% data.forEach(function (car, index) { %>
+                <button type="button" class="configurator-model"
+                  aria-pressed="false"
+                  data-car-id="<%= car.id %>"
+                  data-car-name="<%= car.name %>"
+                  data-car-description="<%= car.description %>"
+                  data-model-url="<%= car.modelUrl %>"
+                  data-available="<%= car.available ? 'true' : 'false' %>">
+                  <span class="configurator-model-number">0<%= index + 1 %></span>
+                  <span>
+                    <strong><%= car.name %></strong>
+                    <span class="configurator-model-caption"><%= car.available ? 'In 3D entdecken' : '3D-Modell folgt' %></span>
+                  </span>
+                  <span class="configurator-model-arrow" aria-hidden="true">↗</span>
+                </button>
+              <% }); %>
+            </div>
+            <p class="muted configurator-selection-note">Wähle ein Fahrzeug für die Rundumansicht.</p>
+          </div>
+        </details>
+
+        <details class="card configurator-step configurator-customization" id="customization-step" name="configurator-steps">
+          <summary class="configurator-step-heading" aria-disabled="true">
+            <span class="configurator-eyebrow">02 / Dein Stil</span>
+            <span class="configurator-step-title" id="customization-title">Mach ihn zu deinem.</span>
+            <span class="configurator-step-meta" id="customization-step-hint">Wähle zuerst ein Modell.</span>
+          </summary>
+          <div class="configurator-step-content">
+            <div class="configurator-area-switch" id="customization-areas" role="group" aria-label="Fahrzeugbereich auswählen" hidden>
+              <button type="button" data-area="exterior" aria-pressed="true">Außen</button>
+              <button type="button" data-area="interior" aria-pressed="false">Innen</button>
+            </div>
+            <p class="muted configurator-customization-note" id="customization-status" role="status">Anpassungen werden vorbereitet …</p>
+            <div id="customization-options"></div>
+            <button type="button" class="configurator-reset configurator-reset-all" id="reset-car-configuration" hidden disabled>Original wiederherstellen</button>
+          </div>
+        </details>
+      </aside>
 
       <section class="card configurator-preview" aria-labelledby="selected-car-name">
         <div class="configurator-preview-heading">
           <div>
             <p class="configurator-eyebrow" id="car-view-label">3D / Außenansicht</p>
-            <h2 id="selected-car-name"><%= data[0].name %></h2>
-            <p class="muted" id="selected-car-description"><%= data[0].description %></p>
+            <h2 id="selected-car-name">Deine Fahrzeugvorschau</h2>
+            <p class="muted" id="selected-car-description">Wähle ein Modell, um mit der Konfiguration zu starten.</p>
           </div>
-          <div class="configurator-price-badge">
+          <div class="configurator-price-badge" id="configuration-price-badge" hidden>
             <span>Gesamtpreis</span>
             <strong id="configuration-total-header">—</strong>
             <small>Demopreis · EUR</small>
@@ -71,11 +81,11 @@
           <button type="button" class="configurator-reset" data-interior-view="seats" aria-pressed="true">Sitze &amp; Details</button>
           <button type="button" class="configurator-reset" data-interior-view="cockpit" aria-pressed="false">Cockpit</button>
         </div>
-        <div class="configurator-stage" id="car-stage" aria-busy="true">
+        <div class="configurator-stage" id="car-stage" aria-busy="false">
           <div id="car-viewer-host"></div>
           <div class="configurator-status" id="car-status" role="status" aria-live="polite">
             <span class="configurator-status-icon" aria-hidden="true">◇</span>
-            <p id="car-status-text">3D-Ansicht wird vorbereitet …</p>
+            <p id="car-status-text">Wähle zuerst dein Fahrzeug aus.</p>
           </div>
         </div>
         <div class="configurator-toolbar">
@@ -86,27 +96,30 @@
           <p class="configurator-eyebrow">Deine Auswahl</p>
           <dl id="configuration-summary-items"></dl>
         </div>
-        <section class="configurator-pricing" aria-labelledby="pricing-title">
-          <p class="configurator-eyebrow">03 / Deine Konfiguration</p>
-          <h2 id="pricing-title">Dein Fahrzeug im Überblick</h2>
-          <dl class="configurator-price-lines">
-            <div><dt>Grundpreis</dt><dd id="configuration-base-price">—</dd></div>
-            <div><dt>Extras</dt><dd id="configuration-extras-price">—</dd></div>
-            <div class="configurator-price-total"><dt>Gesamtpreis</dt><dd id="configuration-total-price">—</dd></div>
-          </dl>
-          <details class="configurator-price-details">
-            <summary>Aufpreise im Detail</summary>
-            <ul id="configuration-price-items"></ul>
-          </details>
-          <p class="muted configurator-price-note">Fiktive Demopreise für dieses Projekt.</p>
-          <div class="configurator-save-actions">
-            <button type="button" class="btn" id="save-car-configuration" disabled>Konfiguration speichern</button>
-            <button type="button" class="configurator-reset" id="retry-configuration-price" hidden>Preis erneut laden</button>
-            <a class="configurator-reset" id="download-car-configuration" hidden>JSON herunterladen</a>
-          </div>
-          <p class="configurator-save-status muted" id="configuration-save-status" role="status" aria-live="polite">Wähle dein Fahrzeug und deine Ausstattung.</p>
-          <a id="open-car-configuration" class="configurator-saved-link" hidden>Gespeicherte Konfiguration öffnen</a>
-        </section>
+      </section>
+
+
+
+      <section class="card configurator-pricing" aria-labelledby="pricing-title" hidden>
+        <p class="configurator-eyebrow">03 / Deine Konfiguration</p>
+        <h2 id="pricing-title">Dein Fahrzeug im Überblick</h2>
+        <dl class="configurator-price-lines">
+          <div><dt>Grundpreis</dt><dd id="configuration-base-price">—</dd></div>
+          <div><dt>Extras</dt><dd id="configuration-extras-price">—</dd></div>
+          <div class="configurator-price-total"><dt>Gesamtpreis</dt><dd id="configuration-total-price">—</dd></div>
+        </dl>
+        <details class="configurator-price-details">
+          <summary>Aufpreise im Detail</summary>
+          <ul id="configuration-price-items"></ul>
+        </details>
+        <p class="muted configurator-price-note">Fiktive Demopreise für dieses Projekt.</p>
+        <div class="configurator-save-actions">
+          <button type="button" class="btn" id="save-car-configuration" disabled>Konfiguration speichern</button>
+          <button type="button" class="configurator-reset" id="retry-configuration-price" hidden>Preis erneut laden</button>
+          <a class="configurator-reset" id="download-car-configuration" hidden>JSON herunterladen</a>
+        </div>
+        <p class="configurator-save-status muted" id="configuration-save-status" role="status" aria-live="polite">Wähle dein Fahrzeug und deine Ausstattung.</p>
+        <a id="open-car-configuration" class="configurator-saved-link" hidden>Gespeicherte Konfiguration öffnen</a>
       </section>
     </div>
     <noscript><p class="stub-note">Aktiviere JavaScript, um Fahrzeuge zu wechseln und in 3D zu betrachten.</p></noscript>

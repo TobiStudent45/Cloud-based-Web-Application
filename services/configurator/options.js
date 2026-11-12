@@ -8,9 +8,6 @@ const lambo = [
       { id: "yellow", label: "Giallo", swatch: "#f5c928", values: { baseColor: "#f5c928" } },
       { id: "green", label: "Verde", swatch: "#69bd35", values: { baseColor: "#69bd35" } },
       { id: "blue", label: "Blu", swatch: "#236bd1", values: { baseColor: "#236bd1" } },
-      { id: "white", label: "Bianco", swatch: "#e7e9e6", values: { baseColor: "#e7e9e6" } },
-      { id: "black", label: "Nero", swatch: "#24262b", values: { baseColor: "#24262b" } },
-      { id: "grey", label: "Grigio", swatch: "#737b85", values: { baseColor: "#737b85" } },
     ],
   },
   {
@@ -18,7 +15,6 @@ const lambo = [
     choices: [
       { id: "original", label: "Original", values: {} },
       { id: "gloss", label: "Glänzend", values: { roughness: 0.18, metallic: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 } },
-      { id: "satin", label: "Satiniert", values: { roughness: 0.5, metallic: 0.15, clearcoat: 0.2, clearcoatRoughness: 0.4 } },
       { id: "matte", label: "Matt", values: { roughness: 0.85, metallic: 0.05, clearcoat: 0, clearcoatRoughness: 0.8 } },
     ],
   },
@@ -71,38 +67,37 @@ const lambo = [
   },
 ];
 
-const interiorColors = [
-  { id: "cream", label: "Creme", swatch: "#dfcdb0", values: { baseColor: "#dfcdb0" } },
-  { id: "cognac", label: "Cognac", swatch: "#9e5933", values: { baseColor: "#9e5933" } },
-  { id: "red", label: "Bordeaux", swatch: "#861f32", values: { baseColor: "#861f32" } },
-  { id: "grey", label: "Hellgrau", swatch: "#b6b7b5", values: { baseColor: "#b6b7b5" } },
-];
+// All vehicles expose the same controls. The Urus GLB has separate materials
+// for the rims, leather panels, headliner and belt webbing.
+const urusMaterials = {
+  paint: ["LLamborghini_UrusPHEVRewardRecycled_2024Paint_Material1"],
+  finish: ["LLamborghini_UrusPHEVRewardRecycled_2024Paint_Material1"],
+  wheels: ["Urus_WheelRim"],
+  calipers: ["LLamborghini_UrusPHEVRewardRecycled_2024_CallipersCallip_0fc65a1"],
+  "interior-leather": ["Urus_Leather"],
+  "interior-alcantara": ["Urus_Alcantara"],
+  "interior-belts": ["Urus_Seatbelt"],
+};
+const urus = lambo.map((group) => ({
+  ...group,
+  materialNames: urusMaterials[group.id],
+  choices: group.choices.map((choice) => {
+    if (group.id === "calipers" && choice.id === "original") {
+      return { ...choice, label: "Original (Silber)", swatch: "#cccccc" };
+    }
+    // Dark atlas colours would otherwise multiply the selected colour.
+    // Only the isolated configurable surface switches to its plain finish.
+    if (choice.id !== "original" && ["wheels", "interior-alcantara", "interior-belts"].includes(group.id)) {
+      return {
+        ...choice,
+        values: {
+          ...choice.values, removeBaseColorTexture: true,
+          ...(group.id === "interior-alcantara" ? { metallic: 0, roughness: 0.95 } : {}),
+        },
+      };
+    }
+    return choice;
+  }),
+}));
 
-const beetle = [
-  {
-    ...lambo.find((group) => group.id === "paint"), materialNames: ["B-paint1"],
-    choices: [
-      { id: "original", label: "Original (Weiß)", swatch: "#ffffff", values: {} },
-      ...lambo.find((group) => group.id === "paint").choices.slice(1),
-    ],
-  },
-  { ...lambo.find((group) => group.id === "finish"), materialNames: ["B-paint1"] },
-  {
-    id: "interior-seats", section: "interior", label: "Sitzpolster", materialNames: ["B-seat1"],
-    choices: [{ id: "original", label: "Original (Anthrazit)", swatch: "#343434", values: {} }, ...interiorColors],
-  },
-  {
-    id: "interior-seat-accents", section: "interior", label: "Sitzakzente", materialNames: ["B-seat2"],
-    choices: [{ id: "original", label: "Original (Grau)", swatch: "#696969", values: {} }, ...interiorColors],
-  },
-  {
-    id: "interior-trim", section: "interior", label: "Innenverkleidung", materialNames: ["B-interior1", "B-interior2", "B-door1"],
-    choices: [{ id: "original", label: "Original", swatch: "#555555", values: {} }, ...interiorColors],
-  },
-  {
-    id: "interior-dashboard", section: "interior", label: "Armaturenbrett", materialNames: ["B-dash1"],
-    choices: [{ id: "original", label: "Original (Anthrazit)", swatch: "#303030", values: {} }, ...interiorColors],
-  },
-];
-
-module.exports = { lambo, beetle };
+module.exports = { lambo, urus };
