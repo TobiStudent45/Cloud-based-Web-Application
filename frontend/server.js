@@ -40,6 +40,7 @@ app.use((req, res, next) => {
 app.all("/api/*", async (req, res) => {
   try {
     const isModel = /^\/api\/configurator\/cars\/[^/]+\/model$/.test(req.path);
+    const isAi = req.path.startsWith("/api/ai/"); // AI feature: Gemini analysis can take up to ~75 s
     const headers = {};
     for (const name of ["range", "if-range", "if-none-match", "if-modified-since", "content-type"]) {
       if (req.headers[name]) headers[name] = req.headers[name];
@@ -48,7 +49,7 @@ app.all("/api/*", async (req, res) => {
     const upstream = await fetch(`${GATEWAY_URL}${req.originalUrl}`, {
       headers, method: req.method,
       ...(!["GET", "HEAD"].includes(req.method) ? { body: req, duplex: "half" } : {}),
-      signal: AbortSignal.timeout(isModel ? 120000 : 10000),
+      signal: AbortSignal.timeout(isModel || isAi ? 120000 : 10000),
     });
     res.status(upstream.status);
     for (const h of ["content-type", "content-length", "cache-control", "content-range", "accept-ranges", "etag", "last-modified", "location", "content-disposition"]) {
