@@ -14,13 +14,13 @@ const app = express();
 app.use(express.json({ limit: "64kb" }));
 const PORT = process.env.PORT || 3000;
 const MODEL_DIRECTORY = path.resolve(process.env.MODEL_DIRECTORY || path.join(__dirname, "models"));
-const db = mysql.createPool({
+const databaseConfig = {
   host: process.env.MYSQL_HOST || "mysql",
   user: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE || "carmanufacturer",
-  connectionLimit: 5,
-});
+};
+const db = mysql.createPool({ ...databaseConfig, connectionLimit: 5 });
 
 async function findCars(id) {
   const [rows] = await db.execute(
@@ -191,8 +191,12 @@ app.use((err, req, res, next) => {
 
 async function start() {
   const schemaPath = process.env.CATALOG_SCHEMA_PATH || path.join(__dirname, "../../db/mysql/configurator.sql");
-  for (const file of [schemaPath, ...["configurator-options.sql", "configurator-pricing.sql", "configurator-configurations.sql"].map((name) => path.join(path.dirname(schemaPath), name))]) {
-    await db.query(await fs.readFile(file, "utf8"));
+  // Only the trusted schema file uses multiple statements; API queries use the pool.
+  const schemaConnection = await mysql.createConnection({ ...databaseConfig, multipleStatements: true });
+  try {
+    await schemaConnection.query(await fs.readFile(schemaPath, "utf8"));
+  } finally {
+    await schemaConnection.end();
   }
   const [sectionColumn] = await db.query("SHOW COLUMNS FROM configurator_option_groups LIKE 'section'");
   if (!sectionColumn.length) {
