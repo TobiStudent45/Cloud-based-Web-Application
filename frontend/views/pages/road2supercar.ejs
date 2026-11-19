@@ -1,12 +1,90 @@
-<section class="card page-head">
-  <h1>Road to the Super Car</h1>
-  <p class="muted">Super Car auf einer Karte auf dem Weg zur Praesentation.</p>
-</section>
+<link rel="stylesheet" href="/css/road2supercar.css" />
 
-<% if (apiError) { %>
-  <div class="stub-note">Service nicht erreichbar: <%= apiError %></div>
-<% } else if (data) { %>
-  <pre class="stub-note"><%= JSON.stringify(data, null, 2) %></pre>
-<% } else { %>
-  <div class="stub-note">Noch keine Daten. Endpunkt in config/pages.js hinterlegen.</div>
-<% } %>
+<section class="r2s" aria-labelledby="r2s-title">
+  <h1 id="r2s-title" class="r2s-sr">Road to the Super Car</h1>
+
+  <div class="r2s-stage" id="r2s" data-state="loading">
+    <canvas id="r2s-canvas" aria-label="3D-Szene: Dein Super Car fährt durch einen Wald zur Super Car Show"></canvas>
+
+    <div class="r2s-loading" id="r2s-loading" role="status">
+      <p class="r2s-eyebrow">Aureo / Road to the Super Car</p>
+      <strong id="r2s-loading-text">Dein Auto wird vorbereitet …</strong>
+      <div class="r2s-loadbar"><span id="r2s-loadbar"></span></div>
+    </div>
+
+    <button type="button" class="r2s-skip" id="r2s-skip" hidden>Überspringen</button>
+    <button type="button" class="r2s-sound" id="r2s-sound" aria-pressed="false">♪ Ton aktivieren</button>
+
+    <!-- details, only after the show has started -->
+    <aside class="r2s-panel" id="r2s-panel" hidden aria-labelledby="r2s-car-name">
+      <p class="r2s-eyebrow">Auf der Show</p>
+      <h2 id="r2s-car-name">—</h2>
+      <p class="r2s-source" id="r2s-car-source"></p>
+      <dl class="r2s-details" id="r2s-details"></dl>
+
+      <label class="r2s-field" for="r2s-car-select">Fahrzeug wechseln</label>
+      <select id="r2s-car-select" class="r2s-select" disabled></select>
+
+      <div class="r2s-actions">
+        <button type="button" class="btn" id="r2s-drive" disabled>Losfahren</button>
+        <button type="button" class="r2s-ghost" id="r2s-replay">Show noch einmal ansehen</button>
+        <a class="r2s-link" href="/configurator">Neues Auto konfigurieren →</a>
+      </div>
+
+    </aside>
+
+    <!-- free drive: panels left and right, speedometer at the bottom -->
+    <div class="r2s-drive" id="r2s-drive-ui" data-locked="true" hidden>
+      <button type="button" class="r2s-back" id="r2s-back">← Zurück zur Show</button>
+      <div class="r2s-mirror" id="r2s-mirror" aria-label="Rückspiegel"></div>
+      <canvas class="r2s-map" id="r2s-map" width="340" height="340" aria-label="Karte mit deiner Position"></canvas>
+      <p class="r2s-toast" id="r2s-toast" role="status"></p>
+
+      <aside class="r2s-controls r2s-controls-left" aria-label="Blinker und Licht">
+        <p class="r2s-eyebrow">Blinker &amp; Licht</p>
+        <button type="button" data-toggle="left" aria-pressed="false"><span class="r2s-icon">◀</span> Blinker links <kbd>Q</kbd></button>
+        <button type="button" data-toggle="right" aria-pressed="false"><span class="r2s-icon">▶</span> Blinker rechts <kbd>E</kbd></button>
+        <button type="button" data-toggle="hazard" aria-pressed="false"><span class="r2s-icon">⚠</span> Warnblinker <kbd>F</kbd></button>
+        <button type="button" data-toggle="lights" aria-pressed="false"><span class="r2s-icon">☀</span> Licht <kbd>L</kbd></button>
+        <button type="button" data-press="horn"><span class="r2s-icon">♪</span> Hupe <kbd>H</kbd></button>
+        <button type="button" data-toggle="mirror" aria-pressed="false"><span class="r2s-icon">◐</span> Rückspiegel <kbd>C</kbd></button>
+      </aside>
+
+      <aside class="r2s-controls r2s-controls-right" aria-label="Fahren">
+        <p class="r2s-eyebrow">Fahren</p>
+        <button type="button" data-hold="throttle" class="r2s-pedal"><span class="r2s-icon">▲</span> Gas <kbd>W</kbd></button>
+        <button type="button" data-hold="brake" class="r2s-pedal"><span class="r2s-icon">▼</span> Bremse <kbd>S</kbd></button>
+        <button type="button" data-hold="nitro" class="r2s-pedal r2s-nitro"><span class="r2s-icon">⚡</span> Boost <kbd>Shift</kbd></button>
+        <button type="button" data-hold="handbrake" class="r2s-pedal"><span class="r2s-icon">●</span> Handbremse <kbd>Space</kbd></button>
+        <div class="r2s-steer">
+          <button type="button" data-hold="left" class="r2s-pedal" aria-label="Nach links lenken">◀ <kbd>A</kbd></button>
+          <button type="button" data-hold="right" class="r2s-pedal" aria-label="Nach rechts lenken"><kbd>D</kbd> ▶</button>
+        </div>
+        <button type="button" data-press="jump" class="r2s-mystery" aria-label="Überraschung: Was passiert, wenn du drückst?"><span class="r2s-icon">⚠</span> Überraschung <kbd>X</kbd></button>
+      </aside>
+
+      <div class="r2s-gauge" role="status" aria-label="Tacho">
+        <svg viewBox="0 0 260 190" aria-hidden="true">
+          <path class="r2s-gauge-track" d="M 36.5 184 A 108 108 0 1 1 223.5 184" />
+          <path class="r2s-gauge-limit" d="M 184 36.5 A 108 108 0 0 1 223.5 184" />
+          <path class="r2s-gauge-active" id="r2s-gauge-active" pathLength="100" d="M 36.5 184 A 108 108 0 1 1 223.5 184" />
+          <g id="r2s-gauge-ticks"></g>
+          <g class="r2s-needle" id="r2s-needle"><line x1="130" y1="130" x2="228" y2="130" /></g>
+          <circle class="r2s-hub" cx="130" cy="130" r="7" />
+        </svg>
+        <div class="r2s-gauge-read"><strong id="r2s-speed">0</strong><small>km/h</small></div>
+        <div class="r2s-boost"><span id="r2s-boost-bar" data-active="false"></span></div>
+      </div>
+      <p class="r2s-hint" id="r2s-hint">W/S Gas · A/D Lenken · C Rückspiegel · Esc Show</p>
+    </div>
+  </div>
+  <noscript><p class="stub-note">Aktiviere JavaScript, um die 3D-Show zu sehen.</p></noscript>
+
+  <script type="importmap">
+    { "imports": {
+      "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+    } }
+  </script>
+  <script type="module" src="/js/road2supercar.js"></script>
+</section>
