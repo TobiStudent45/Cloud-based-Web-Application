@@ -67,39 +67,10 @@
 .home .tile:hover .mer img{transform:scale(1.07)}
 .home .tile .sub{margin-top:4px}
 
-/* Road2Supercar: looping drive from the forest to the Super Car Show */
-.home .r2s-film{position:relative;height:150px;margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
-.home .r2s-scene{display:block;width:100%;height:100%}
-/* clouds and mountains drift slowly (far = slow parallax) */
-.home .r2s-clouds{animation:home-r2s-scroll 26s linear infinite}
-.home .r2s-mtn{animation:home-r2s-scroll 20s linear infinite}
-.home .r2s-hills{animation:home-r2s-scroll 13s linear infinite}
-@keyframes home-r2s-scroll{to{transform:translateX(-400px)}}
-/* tree rows rush past: back row medium, near row fast (close = fast parallax) */
-.home .r2s-trees-far{animation:home-r2s-trees-far 6s linear infinite}
-@keyframes home-r2s-trees-far{to{transform:translateX(-420px)}}
-.home .r2s-trees-near{animation:home-r2s-trees-near 3.2s linear infinite}
-@keyframes home-r2s-trees-near{to{transform:translateX(-440px)}}
-/* centre dashes grow and rush toward the viewer, suggesting forward motion */
-.home .r2s-dashes polygon{animation:home-r2s-dash 1s linear infinite}
-.home .r2s-dashes polygon:nth-child(2){animation-delay:-.33s}
-.home .r2s-dashes polygon:nth-child(3){animation-delay:-.66s}
-@keyframes home-r2s-dash{0%{opacity:0;transform:translateY(-6px) scaleY(.5)}25%{opacity:1}100%{opacity:0;transform:translateY(24px) scaleY(2.4)}}
-.home .r2s-leaves circle{transform-box:fill-box;transform-origin:center;animation:home-r2s-leaf 2.4s linear infinite}
-.home .r2s-leaves circle:nth-child(2){animation-delay:-.7s}
-.home .r2s-leaves circle:nth-child(3){animation-delay:-1.2s}
-.home .r2s-leaves circle:nth-child(4){animation-delay:-1.8s}
-.home .r2s-leaves circle:nth-child(5){animation-delay:-.4s}
-@keyframes home-r2s-leaf{0%{opacity:0;transform:translateY(0) scale(.6)}30%{opacity:.9}100%{opacity:0;transform:translateY(22px) scale(1.5)}}
-/* the car bobs gently as it drives */
-.home .r2s-car{transform-box:view-box;transform-origin:200px 128px;animation:home-r2s-car 1.6s ease-in-out infinite alternate}
-@keyframes home-r2s-car{from{transform:translateX(-3px) rotate(-.6deg)}to{transform:translateX(3px) rotate(.6deg)}}
-/* the Super Car Show fades in at the end of each loop, as if arriving */
-.home .r2s-show{transform-box:view-box;transform-origin:200px 86px;animation:home-r2s-show 9s ease-in-out infinite}
-@keyframes home-r2s-show{0%,55%{opacity:0;transform:scale(.4)}80%,92%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
-
-.home .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.home .chips span{font-size:12px;color:var(--mut);background:var(--soft);border-radius:999px;padding:4px 11px}
+/* Road2Supercar: looping film of the real 3D drive from the forest to the Super Car Show */
+.home .r2s-film{position:relative;margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/7;background:#2a3b2a}
+.home .r2s-video{display:block;width:100%;height:100%;object-fit:cover}
+.home .tile:hover .r2s-film{border-color:#d4d4d8}
 
 /* AI feature: animated Gemini mark */
 .home .gem{margin-top:16px;height:88px;border-radius:12px;background:radial-gradient(120% 120% at 30% 20%,#101827,#0b1020);display:grid;place-items:center;overflow:hidden}
@@ -131,9 +102,6 @@
   .home .marq{overflow-x:auto}
   .home .ai em{width:24ch}
   .home .gem-spark{opacity:1;transform:none}
-  /* keep the drive scene legible when paused */
-  .home .r2s-dashes polygon,.home .r2s-leaves circle{opacity:1;transform:none}
-  .home .r2s-show{opacity:1;transform:none}
 }
 .home .go span[aria-hidden]{display:inline-block;transition:transform .25s}
 .home .tile:hover .go span[aria-hidden]{transform:translateX(4px)}

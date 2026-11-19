@@ -4,6 +4,12 @@
   if (!home) return;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // visitors who ask for less motion get the poster still instead of the looping drive video
+  if (reduce) {
+    var r2sVid = home.querySelector('.r2s-video');
+    if (r2sVid) { r2sVid.removeAttribute('autoplay'); try { r2sVid.pause(); } catch (e) {} }
+  }
+
   if (!reduce && 'IntersectionObserver' in window) {
     document.documentElement.classList.add('js-home');
     var io = new IntersectionObserver(function (es) {
