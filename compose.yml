@@ -135,6 +135,12 @@ services:
 
   road2supercar:
     build: ./services/road2supercar
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      redis:
+        condition: service_healthy
     networks: [app-net]
 
   ai:

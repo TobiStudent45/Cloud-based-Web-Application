@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/css/configurator.css" />
 <link rel="stylesheet" href="/css/ai.css" />
+<link rel="stylesheet" href="/css/road2supercar.css" />
 
 <section class="configurator" aria-labelledby="configurator-title">
   <header class="configurator-heading">
@@ -122,10 +123,12 @@
         </div>
         <p class="configurator-save-status muted" id="configuration-save-status" role="status" aria-live="polite">Wähle dein Fahrzeug und deine Ausstattung.</p>
         <a id="open-car-configuration" class="configurator-saved-link" hidden>Gespeicherte Konfiguration öffnen</a>
+        <a id="road-open" class="btn road-open" href="/road2supercar" hidden>Mit diesem Auto auf die Strecke →</a>
       </section>
     </div>
     <noscript><p class="stub-note">Aktiviere JavaScript, um Fahrzeuge zu wechseln und in 3D zu betrachten.</p></noscript>
     <script type="module" src="/js/configurator.js"></script>
     <script type="module" src="/js/ai-configurator.js"></script>
+    <script type="module" src="/js/road2supercar-configurator.js"></script>
   <% } %>
 </section>
