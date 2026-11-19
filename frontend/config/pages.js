@@ -5,12 +5,12 @@
 
 module.exports = [
   { label: "Home",          path: "/",              view: "home" },
-  { label: "Konfigurator",  path: "/configurator",  view: "configurator",  api: "/configurator/cars" },
   { label: "Merchandise",   path: "/merchandise",   view: "merchandise",   api: "/merchandise/products",
     detail: { view: "merchandise", api: "/merchandise/products/:id" } },
   { label: "Impressionen",  path: "/impressions",   view: "impressions",   api: "/impressions/images" },
-  { label: "Road2Supercar", path: "/road2supercar", view: "road2supercar" },
+  { label: "Konfigurator",  path: "/configurator",  view: "configurator",  api: "/configurator/cars" },
   { label: "AI Feature",    path: "/ai",            view: "ai",            api: "/ai" },
+  { label: "Road2Supercar", path: "/road2supercar", view: "road2supercar" },
   { label: "Warenkorb",     path: "/shoppingcart",  view: "shoppingcart",  nav: false },
   { label: "Kasse",         path: "/checkout",      view: "checkout",      nav: false },
   { label: "Bestellung",    path: "/order",         view: "order",         nav: false },
